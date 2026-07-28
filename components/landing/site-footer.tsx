@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { AtSign, Link2, Rss, Video } from "lucide-react";
+import { FaGithub, FaLinkedin, FaYoutube } from "react-icons/fa6";
+import { FaXTwitter } from "react-icons/fa6";
 import { Logo } from "@/components/shared/logo";
 
 const FOOTER_LINKS = {
@@ -10,23 +11,46 @@ const FOOTER_LINKS = {
     { label: "Live Demo", href: "#demo" },
   ],
   Company: [
-    { label: "About", href: "#" },
-    { label: "Careers", href: "#" },
-    { label: "Blog", href: "#" },
-    { label: "Contact", href: "#" },
+    { label: "About", href: "/about" },
+    { label: "Careers", href: "/careers" },
+    { label: "Blog", href: "/blog" },
+    { label: "Contact", href: "/contact" },
   ],
   Resources: [
-    { label: "Help Center", href: "#" },
-    { label: "Interview Guides", href: "#" },
-    { label: "Question Bank", href: "#" },
-    { label: "API Docs", href: "#" },
+    { label: "Help Center", href: "/help" },
+    { label: "Interview Guides", href: "/guides" },
+    { label: "Question Bank", href: "/questions" },
+    { label: "API Docs", href: "/docs" },
   ],
   Legal: [
-    { label: "Privacy Policy", href: "#" },
-    { label: "Terms of Service", href: "#" },
-    { label: "Security", href: "#" },
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Terms of Service", href: "/terms" },
+    { label: "Security", href: "/security" },
   ],
-};
+} as const;
+
+const SOCIAL_LINKS = [
+  {
+    label: "GitHub",
+    href: "https://github.com/",
+    icon: FaGithub,
+  },
+  {
+    label: "LinkedIn",
+    href: "https://linkedin.com/",
+    icon: FaLinkedin,
+  },
+  {
+    label: "Twitter",
+    href: "https://x.com/",
+    icon: FaXTwitter,
+  },
+  {
+    label: "YouTube",
+    href: "https://youtube.com/",
+    icon: FaYoutube,
+  },
+];
 
 export function SiteFooter() {
   return (
@@ -35,20 +59,24 @@ export function SiteFooter() {
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 lg:grid-cols-6">
           <div className="col-span-2 lg:col-span-2">
             <Logo />
+
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
-              Premium AI-powered interview preparation. Practice smarter, walk
-              in confident, get hired.
+              Premium AI-powered interview preparation. Practice smarter,
+              interview with confidence, and land your dream job.
             </p>
-            <div className="mt-5 flex items-center gap-2">
-              {[AtSign, Link2, Rss, Video].map((Icon, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  aria-label="Social link"
-                  className="flex size-9 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-primary/30 hover:bg-primary/10 hover:text-primary"
+
+            <div className="mt-6 flex items-center gap-2">
+              {SOCIAL_LINKS.map(({ label, href, icon: Icon }) => (
+                <Link
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="flex size-10 items-center justify-center rounded-lg border border-border text-muted-foreground transition-all hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
                 >
                   <Icon className="size-4" />
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -56,6 +84,7 @@ export function SiteFooter() {
           {Object.entries(FOOTER_LINKS).map(([heading, links]) => (
             <div key={heading}>
               <h4 className="font-display text-sm font-semibold">{heading}</h4>
+
               <ul className="mt-4 space-y-2.5">
                 {links.map((link) => (
                   <li key={link.label}>
@@ -76,8 +105,9 @@ export function SiteFooter() {
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} MockMind AI. All rights reserved.
           </p>
+
           <p className="text-xs text-muted-foreground">
-            Designed &amp; built for candidates who prepare on purpose.
+            Designed and built for candidates who prepare with purpose.
           </p>
         </div>
       </div>

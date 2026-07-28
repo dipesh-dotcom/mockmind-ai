@@ -10,6 +10,7 @@ import {
   Timer,
   Users,
 } from "lucide-react";
+
 import { SectionHeading } from "@/components/shared/section-heading";
 import { RevealGroup, RevealItem } from "@/components/shared/reveal";
 import { Card } from "@/components/ui/card";
@@ -25,72 +26,78 @@ const FEATURES = [
     icon: Code2,
     title: "Live coding rounds",
     description:
-      "Solve real DSA and system design problems in a full code editor with instant complexity feedback.",
+      "Solve real coding, DSA, and system design challenges with instant AI-powered feedback.",
   },
   {
     icon: MessagesSquare,
-    title: "Behavioral deep dives",
+    title: "Behavioral interview coaching",
     description:
-      "Practice STAR-format answers for leadership, conflict, and ownership questions used at top companies.",
+      "Master STAR-format answers for leadership, teamwork, conflict resolution, and ownership questions.",
   },
   {
     icon: FileSearch,
     title: "AI resume analyzer",
     description:
-      "Get an ATS compatibility score, keyword gaps, and line-by-line rewrite suggestions in seconds.",
+      "Receive ATS scores, keyword suggestions, and personalized improvements within seconds.",
   },
   {
     icon: LineChart,
-    title: "Progress you can see",
+    title: "Track your progress",
     description:
-      "Track clarity, confidence, and technical depth over time with clean, exportable analytics.",
+      "Monitor clarity, confidence, technical skills, and overall interview readiness over time.",
   },
   {
     icon: Timer,
-    title: "Timed, pressure-tested",
+    title: "Timed mock interviews",
     description:
-      "Practice under real interview time constraints so the real thing feels familiar, not stressful.",
+      "Practice under realistic interview time limits so every session feels like the real thing.",
   },
   {
     icon: Users,
-    title: "Company-specific tracks",
+    title: "Company-specific preparation",
     description:
-      "Curated question banks modeled on real interview loops from 200+ companies.",
+      "Practice interview questions inspired by real hiring processes from top tech companies.",
   },
   {
     icon: ShieldCheck,
-    title: "Private by design",
+    title: "Privacy first",
     description:
-      "Your recordings, transcripts, and resume stay encrypted and are never used to train external models.",
+      "Your recordings, transcripts, resumes, and interview history remain encrypted and secure.",
   },
 ];
 
 export function Features() {
   return (
-    <section id="features" className="py-24 sm:py-32">
+    <section id="features" className="relative py-24 sm:py-32">
       <div className="container-page">
         <SectionHeading
           eyebrow="Platform"
-          title="Everything you need to prepare, in one focused workspace"
-          description="No tab-switching, no guesswork. MockMind AI brings practice, feedback, and tracking into a single clean experience."
+          title="Everything you need to ace your interviews"
+          description="MockMind AI combines realistic practice, AI feedback, and progress tracking into one modern workspace."
         />
 
-        <RevealGroup className="mt-16 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {FEATURES.map((feature) => (
-            <RevealItem key={feature.title}>
-              <Card className="group h-full p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 hover:border-primary/30">
-                <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:gradient-brand group-hover:text-white">
-                  <feature.icon className="size-5" />
-                </div>
-                <h3 className="mt-4 font-display text-base font-semibold">
-                  {feature.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {feature.description}
-                </p>
-              </Card>
-            </RevealItem>
-          ))}
+        <RevealGroup className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {FEATURES.map((feature) => {
+            const Icon = feature.icon;
+
+            return (
+              <RevealItem key={feature.title}>
+                <Card className="glass group h-full rounded-2xl border border-border p-6 transition-all duration-300 hover:-translate-y-2 hover:border-primary/30 hover:shadow-2xl">
+                  <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 transition-all duration-300 group-hover:bg-primary group-hover:text-white">
+                    <Icon className="size-5 transition-transform duration-300 group-hover:scale-110" />
+                  </div>
+
+                  <h3 className="mt-5 font-display text-lg font-semibold">
+                    {feature.title}
+                  </h3>
+
+                  <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                    {feature.description}
+                  </p>
+                </Card>
+              </RevealItem>
+            );
+          })}
         </RevealGroup>
       </div>
     </section>

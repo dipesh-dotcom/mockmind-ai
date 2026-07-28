@@ -170,7 +170,7 @@ export function DemoPreview() {
                     MockMind Interviewer
                   </span>
                 </div>
-                <Badge variant="success" className="gap-1">
+                <Badge variant="ghost" className="gap-1">
                   <span className="size-1.5 rounded-full bg-success animate-pulse" />{" "}
                   Live
                 </Badge>
