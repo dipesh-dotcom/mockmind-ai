@@ -43,7 +43,6 @@ model User {
   updatedAt DateTime @updatedAt
 
   accounts Account[]
-  sessions Session[]
 
   @@index([email])
 }
@@ -70,20 +69,6 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
-  @@index([userId])
-}
-
-model Session {
-  id String @id @default(uuid())
-
-  sessionToken String @unique
-
-  userId String
-
-  expires DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
   @@index([userId])
 }
 
