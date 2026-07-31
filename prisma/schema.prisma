@@ -5,8 +5,42 @@
 
 generator client {
   provider = "prisma-client"
+  output   = "../lib/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+// Enums
+
+enum AuthProvider {
+  CREDENTIALS
+  GOOGLE
+  GITHUB
+}
+
+// Schemas
+
+model User {
+  id            String       @id @default(cuid())
+  email         String       @unique
+  passwordHash  String? // null for OAuth-only accounts
+  provider      AuthProvider @default(CREDENTIALS)
+  emailVerified DateTime?
+
+  name       String
+  avatarUrl  String?
+  bio        String?
+  targetRole String?
+  location   String?
+  timezone   String?
+
+  currentStreak Int @default(0)
+  longestStreak Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
 }
