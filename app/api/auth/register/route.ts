@@ -8,7 +8,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
   try {
     const body = await req.json();
 
+    console.log("Received request body:", body);
     const result = registerSchema.safeParse(body);
+    console.log("Validation result:", result);
 
     if (!result.success) {
       return NextResponse.json(
@@ -64,11 +66,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     return NextResponse.json(
       {
-        error: "Internal Server Error",
+        error: error instanceof Error ? error.message : "Unknown error",
       },
-      {
-        status: 500,
-      },
+      { status: 500 },
     );
   }
 }
