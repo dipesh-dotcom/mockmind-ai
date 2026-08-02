@@ -1,4 +1,3 @@
-
 import { prisma } from "@/lib/prisma";
 import { registerSchema } from "@/schemas/auth.schema";
 import { hash } from "bcryptjs";
@@ -37,7 +36,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         },
         {
           status: 409,
-        }
+        },
       );
     }
 
@@ -58,9 +57,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
       },
       {
         status: 201,
-      }
+      },
     );
-    
   } catch (error) {
     console.error(error);
 
@@ -70,7 +68,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       },
       {
         status: 500,
-      }
+      },
     );
   }
 }
