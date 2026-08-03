@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { registerSchema } from "@/schemas/auth.schema";
+import { registerSchema } from "@/schemas/register.schema";
 import { hash } from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 import z from "zod";

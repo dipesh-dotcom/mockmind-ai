@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { registerSchema, type RegisterInput } from "@/schemas/auth.schema";
+import { registerSchema, type RegisterInput } from "@/schemas/register.schema";
 
 import { cn } from "@/lib/utils";
 
