@@ -44,6 +44,6 @@ next-env.d.ts
 
 /lib/generated/prisma
 
-/ .agents/
-/ .claude/
-/ .windsurf/
+.agents/
+.claude/
+.windsurf/
