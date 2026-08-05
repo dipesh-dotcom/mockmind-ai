@@ -9,10 +9,6 @@ import { prisma } from "./lib/prisma";
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
 
-  session: {
-    strategy: "jwt",
-  },
-
   providers: [
     // Google({
     //   clientId: process.env.AUTH_GOOGLE_ID!,
@@ -49,13 +45,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         if (!user.passwordHash) {
           throw new Error(
-            "This account uses Google or GitHub. Please sign in with your provider."
+            "This account uses Google or GitHub. Please sign in with your provider.",
           );
         }
 
         const isValid = await compare(
           credentials.password as string,
-          user.passwordHash
+          user.passwordHash,
         );
 
         if (!isValid) {
@@ -72,10 +68,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
 
+  session: {
+    strategy: "jwt",
+    maxAge: 60 * 60 * 24 * 30, // 30 days
+  },
+
+  jwt: {
+    maxAge: 60 * 60 * 24 * 30,
+  },
+
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
       }
 
       return token;
@@ -84,6 +91,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
+        session.user.email = token.email!;
+        session.user.name = token.name!;
       }
 
       return session;

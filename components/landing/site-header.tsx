@@ -3,7 +3,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import { Menu, LayoutDashboard, LogOut, User } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Logo } from "@/components/shared/logo";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
@@ -15,6 +15,16 @@ import {
   DrawerTrigger,
   DrawerClose,
 } from "@/components/ui/drawer";
+import { useSession, signOut } from "next-auth/react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const NAV_LINKS = [
   { label: "Features", href: "#features" },
@@ -26,6 +36,7 @@ const NAV_LINKS = [
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = React.useState(false);
+  const { data: session, status } = useSession();
 
   React.useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -57,13 +68,86 @@ export function SiteHeader() {
 
         <div className="hidden lg:flex items-center gap-2">
           <ThemeToggle />
-          <Link href="/sign-in">
-            <Button variant="ghost">Sign in</Button>
-          </Link>
 
-          <Link href="/sign-up">
-            <Button>Get Started Free</Button>
-          </Link>
+          {status === "loading" ? null : session ? (
+            <>
+              <Link href="/dashboard">
+                <Button variant="outline">
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  Dashboard
+                </Button>
+              </Link>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger className="inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-accent">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage
+                      src={session.user?.image ?? ""}
+                      alt={session.user?.name ?? ""}
+                    />
+
+                    <AvatarFallback>
+                      {session.user?.name
+                        ?.split(" ")
+                        .map((word) => word[0])
+                        .join("")
+                        .slice(0, 2)
+                        .toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent align="end" className="w-64">
+                  <div className="px-3 py-2">
+                    <p className="font-medium">{session.user?.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {session.user?.email}
+                    </p>
+                  </div>
+
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItem>
+                    <Link href="/dashboard">
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem>
+                    <Link href="/profile">
+                      <User className="mr-2 h-4 w-4" />
+                      Profile
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItem
+                    className="text-destructive"
+                    onClick={() =>
+                      signOut({
+                        callbackUrl: "/",
+                      })
+                    }
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            <>
+              <Link href="/sign-in">
+                <Button variant="ghost">Sign in</Button>
+              </Link>
+
+              <Link href="/sign-up">
+                <Button>Get Started Free</Button>
+              </Link>
+            </>
+          )}
         </div>
 
         <div className="flex items-center gap-1 lg:hidden">
@@ -92,13 +176,21 @@ export function SiteHeader() {
                 ))}
               </div>
               <div className="flex flex-col gap-2 border-t border-border p-6">
-                <Link href="/sign-in">
-                  <Button variant="ghost">Sign in</Button>
-                </Link>
+                {status === "loading" ? null : session ? (
+                  <Link href="/dashboard">
+                    <Button>Dashboard</Button>
+                  </Link>
+                ) : (
+                  <>
+                    <Link href="/sign-in">
+                      <Button variant="ghost">Sign in</Button>
+                    </Link>
 
-                <Link href="/sign-up">
-                  <Button>Get Started Free</Button>
-                </Link>
+                    <Link href="/sign-up">
+                      <Button>Get Started Free</Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </DrawerContent>
           </Drawer>
