@@ -46,11 +46,11 @@ export function StatsRow() {
                 <stat.icon className="size-5" />
               </span>
             </div>
-            <p className="mt-4 font-display text-2xl font-semibold tracking-tight">
+            <p className="mt-2 font-display text-2xl font-semibold tracking-tight">
               {stat.value}
             </p>
             <p className="text-sm text-muted-foreground">{stat.label}</p>
-            <p className="mt-2 text-xs font-medium text-success">
+            <p className="mt-1 text-xs font-medium text-success">
               {stat.delta}
             </p>
           </Card>

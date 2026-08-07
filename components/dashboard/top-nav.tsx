@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Bell, Menu, Plus, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
@@ -21,6 +21,8 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { NotificationsPanel } from "./notifications-panel";
+import { cn } from "@/lib/utils";
+import { CreateInterviewDialog } from "../interview/create-interview-dialog";
 
 export function DashboardTopNav({ title }: { title?: string }) {
   const { setMobileOpen } = useSidebar();
@@ -47,30 +49,34 @@ export function DashboardTopNav({ title }: { title?: string }) {
         <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="Search roles, questions, courses..."
-          className="h-10 pl-10"
+          className="h-10 pl-10 shadow-sm"
         />
       </div>
 
       <div className="ml-auto flex items-center gap-1.5 sm:ml-0">
-        <Button size="sm" className="hidden sm:inline-flex">
-          <Link href="/practice">
-            <Plus className="size-4" /> New interview
-          </Link>
-        </Button>
+        <CreateInterviewDialog
+          trigger={
+            <Button size="sm" className="hidden sm:inline-flex">
+              <Plus className="size-4" /> New interview
+            </Button>
+          }
+        />
 
-        <ThemeToggle />
+        <ThemeToggle className="border-0" />
 
         <Popover>
-          <PopoverTrigger>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative"
-              aria-label="Notifications"
-            >
-              <Bell className="size-[18px]" />
-              <span className="absolute right-2 top-2 flex size-2 rounded-full bg-accent" />
-            </Button>
+          <PopoverTrigger
+            className={cn(
+              buttonVariants({
+                variant: "ghost",
+                size: "icon",
+              }),
+              "relative border-0",
+            )}
+            aria-label="Notifications"
+          >
+            <Bell className="size-4.5" />
+            <span className="absolute right-2 top-2 flex size-2 rounded-full bg-accent" />
           </PopoverTrigger>
           <PopoverContent align="end" className="w-80 p-0">
             <NotificationsPanel />
@@ -78,12 +84,10 @@ export function DashboardTopNav({ title }: { title?: string }) {
         </Popover>
 
         <DropdownMenu>
-          <DropdownMenuTrigger>
-            <button className="ml-1 rounded-full outline-none ring-offset-2 ring-offset-background focus-visible:ring-2 focus-visible:ring-ring">
-              <Avatar>
-                <AvatarFallback>JL</AvatarFallback>
-              </Avatar>
-            </button>
+          <DropdownMenuTrigger className="ml-1 rounded-full outline-none ring-offset-2 ring-offset-background focus-visible:ring-2 focus-visible:ring-ring">
+            <Avatar>
+              <AvatarFallback>JL</AvatarFallback>
+            </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>

@@ -25,7 +25,7 @@ export function WelcomeSection() {
           </p>
         </div>
 
-        <Card className="flex w-full shrink-0 items-center gap-4 border-primary/20 bg-primary/5 p-4 sm:w-72">
+        <Card className="flex flex-row shadow-sm w-full shrink-0 items-center gap-4 border-primary/20 bg-primary/5 p-4 sm:w-72">
           <div className="relative flex size-16 shrink-0 items-center justify-center">
             <svg viewBox="0 0 64 64" className="size-16 -rotate-90">
               <circle
