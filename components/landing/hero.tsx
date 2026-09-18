@@ -17,16 +17,16 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden pt-16 pb-24 sm:pt-24 sm:pb-32">
-      {/* Ambient gradient background */}
+    <section className="relative overflow-hidden pt-16 pb-20 sm:pt-24 sm:pb-28">
+      {/* Subtle background */}
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute left-1/2 top-[-10%] h-[560px] w-[560px] -translate-x-1/2 rounded-full bg-primary/20 blur-[120px] dark:bg-primary/25" />
-        <div className="absolute right-[5%] top-[15%] h-[360px] w-[360px] rounded-full bg-accent/20 blur-[110px] [animation:var(--animate-float)]" />
-        <div className="absolute left-[2%] top-[35%] h-[300px] w-[300px] rounded-full bg-secondary/20 blur-[100px] [animation:var(--animate-float)] [animation-delay:1.5s]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,var(--background)_92%)]" />
+        <div className="absolute left-1/2 top-[-180px] h-[500px] w-[700px] -translate-x-1/2 rounded-full bg-primary/[0.045] blur-3xl" />
+
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent" />
       </div>
 
       <div className="container-page">
+        {/* Hero copy */}
         <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -34,11 +34,11 @@ export function Hero() {
             transition={{ duration: 0.5 }}
           >
             <Badge
-              variant="gradient"
-              className="px-4 py-1.5 text-xs shadow-md shadow-primary/20"
+              variant="outline"
+              className="gap-1.5 border-teal-200 bg-teal-50 px-3.5 py-1.5 text-xs font-medium text-teal-700 dark:border-teal-900 dark:bg-teal-950/40 dark:text-teal-300"
             >
               <Sparkles className="size-3.5" />
-              Trained on 50,000+ real interviews
+              AI-powered interview practice
             </Badge>
           </motion.div>
 
@@ -48,23 +48,23 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.08 }}
             className="mt-7 text-balance font-display text-4xl font-semibold leading-[1.08] tracking-tight sm:text-6xl"
           >
-            Walk into every interview
+            Practice the interview
             <br />
-            like you've{" "}
-            <span className="gradient-text">already done it before.</span>
+            <span className="gradient-text">before it actually matters.</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.16 }}
-            className="mt-6 text-balance text-lg leading-relaxed text-muted-foreground sm:text-xl"
+            className="mt-6 max-w-2xl text-balance text-lg leading-relaxed text-muted-foreground sm:text-xl"
           >
-            MockMind AI runs realistic voice, text, coding and behavioral mock
-            interviews, then gives you sharp, actionable feedback—so you walk
-            into every interview prepared, not hopeful.
+            MockMind gives you realistic mock interviews, follow-up questions,
+            and focused feedback on how you communicate, solve problems, and
+            handle pressure.
           </motion.p>
 
+          {/* CTA */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -81,11 +81,12 @@ export function Hero() {
             <a href="#demo">
               <Button size="lg" variant="outline" className="w-full sm:w-auto">
                 <PlayCircle className="size-4" />
-                Watch it in action
+                See how it works
               </Button>
             </a>
           </motion.div>
 
+          {/* Social proof */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -98,115 +99,141 @@ export function Hero() {
                   key={initials}
                   className="size-8 border-2 border-background"
                 >
-                  <AvatarFallback className="text-[11px]">
+                  <AvatarFallback className="bg-muted text-[11px] font-medium">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
               ))}
             </div>
 
-            <span>Joined by 42,000+ candidates preparing this month</span>
+            <span>
+              Join thousands of candidates practicing for their next interview
+            </span>
           </motion.div>
         </div>
 
         {/* Product Preview */}
         <motion.div
-          initial={{ opacity: 0, y: 40, scale: 0.97 }}
+          initial={{ opacity: 0, y: 35, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.7, delay: 0.3 }}
-          className="relative mx-auto mt-20 max-w-4xl"
+          className="relative mx-auto mt-16 max-w-5xl sm:mt-20"
         >
-          <div className="glow-ring relative rounded-2xl border border-border bg-card p-3 shadow-2xl sm:p-4">
+          <div className="glow-ring relative rounded-2xl border border-border bg-card p-3 sm:p-4">
+            {/* Browser chrome */}
             <div className="flex items-center gap-1.5 px-2 pb-3">
-              <span className="size-2.5 rounded-full bg-destructive/60" />
-              <span className="size-2.5 rounded-full bg-warning/60" />
-              <span className="size-2.5 rounded-full bg-success/60" />
-              <span className="ml-3 text-xs text-muted-foreground">
-                mockmind.ai/interview/senior-frontend-engineer
-              </span>
+              <span className="size-2.5 rounded-full bg-destructive/50" />
+              <span className="size-2.5 rounded-full bg-warning/50" />
+              <span className="size-2.5 rounded-full bg-success/50" />
+
+              <div className="ml-3 flex h-7 flex-1 items-center rounded-md border border-border bg-muted/50 px-3">
+                <span className="truncate text-[11px] text-muted-foreground">
+                  mockmind.ai/interview/senior-frontend-engineer
+                </span>
+              </div>
             </div>
 
-            <div className="grid gap-3 rounded-xl bg-surface p-4 sm:grid-cols-[1.3fr_1fr] sm:p-5">
-              {/* Left Panel */}
+            {/* Application */}
+            <div className="grid gap-3 rounded-xl bg-surface p-3 sm:grid-cols-[1.35fr_1fr] sm:p-4">
+              {/* Interview panel */}
               <div className="rounded-xl border border-border bg-card p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <span className="gradient-brand flex size-8 items-center justify-center rounded-lg text-white">
-                      <Sparkles className="size-4" />
+                    <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                      <Mic className="size-4" />
                     </span>
 
                     <div>
                       <p className="text-sm font-semibold">
                         MockMind Interviewer
                       </p>
+
                       <p className="text-xs text-muted-foreground">
-                        Senior Frontend Engineer · Live
+                        Senior Frontend Engineer
                       </p>
                     </div>
                   </div>
 
-                  <Badge variant="success" className="gap-1">
+                  <Badge
+                    variant="outline"
+                    className="gap-1 border-success/30 bg-success/5 text-success"
+                  >
                     <span className="size-1.5 animate-pulse rounded-full bg-success" />
                     Recording
                   </Badge>
                 </div>
 
-                <div className="mt-4 space-y-2.5">
-                  <div className="rounded-xl rounded-tl-sm bg-muted px-3.5 py-2.5 text-sm">
+                {/* Conversation */}
+                <div className="mt-5 space-y-2.5">
+                  <div className="max-w-[90%] rounded-xl rounded-tl-sm bg-muted px-3.5 py-2.5 text-sm leading-relaxed">
                     Tell me about a time you optimized a slow-rendering React
                     application.
                   </div>
 
-                  <div className="gradient-brand ml-auto max-w-[85%] rounded-xl rounded-tr-sm px-3.5 py-2.5 text-sm text-white">
-                    Sure—on our dashboard, list re-renders were reducing FPS, so
-                    I memoized selectors and virtualized the table...
+                  <div className="ml-auto max-w-[88%] rounded-xl rounded-tr-sm bg-primary px-3.5 py-2.5 text-sm leading-relaxed text-primary-foreground">
+                    Sure — on our dashboard, list re-renders were reducing FPS,
+                    so I memoized selectors and virtualized the table...
                   </div>
                 </div>
 
-                <div className="mt-4 flex items-center gap-2 rounded-xl border border-border p-2.5">
-                  <Mic className="size-4 text-primary" />
-
-                  <div className="flex h-6 flex-1 items-center gap-0.5">
-                    {[6, 14, 9, 20, 12, 18, 8, 16, 10].map((height, index) => (
-                      <span
-                        key={index}
-                        className="gradient-brand w-1 rounded-full"
-                        style={{ height: `${height}px` }}
-                      />
-                    ))}
+                {/* Audio */}
+                <div className="mt-5 flex items-center gap-2 rounded-xl border border-border bg-background p-2.5">
+                  <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10">
+                    <Mic className="size-4 text-primary" />
                   </div>
 
-                  <span className="text-xs font-medium text-muted-foreground">
+                  <div className="flex h-6 flex-1 items-center gap-0.5">
+                    {[6, 14, 9, 20, 12, 18, 8, 16, 10, 15, 7].map(
+                      (height, index) => (
+                        <span
+                          key={index}
+                          className="w-1 rounded-full bg-primary/70"
+                          style={{ height: `${height}px` }}
+                        />
+                      ),
+                    )}
+                  </div>
+
+                  <span className="text-xs font-medium tabular-nums text-muted-foreground">
                     02:14
                   </span>
                 </div>
               </div>
 
-              {/* Right Panel */}
+              {/* Right column */}
               <div className="flex flex-col gap-3">
+                {/* Score */}
                 <div className="rounded-xl border border-border bg-card p-4">
-                  <p className="text-xs font-medium text-muted-foreground">
-                    Live Score
-                  </p>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground">
+                        Interview score
+                      </p>
 
-                  <p className="gradient-text mt-1 font-display text-3xl font-semibold">
-                    87%
-                  </p>
+                      <p className="mt-1 font-display text-3xl font-semibold text-primary">
+                        87%
+                      </p>
+                    </div>
 
-                  <div className="mt-3 space-y-2">
+                    <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10">
+                      <CheckCircle2 className="size-4 text-primary" />
+                    </div>
+                  </div>
+
+                  <div className="mt-4 space-y-3">
                     {[
                       { label: "Clarity", value: 90 },
                       { label: "Technical depth", value: 82 },
                     ].map((item) => (
                       <div key={item.label}>
-                        <div className="mb-1 flex justify-between text-[11px] text-muted-foreground">
+                        <div className="mb-1.5 flex justify-between text-[11px] text-muted-foreground">
                           <span>{item.label}</span>
                           <span>{item.value}%</span>
                         </div>
 
-                        <div className="h-1.5 w-full rounded-full bg-muted">
+                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
                           <div
-                            className="gradient-brand h-1.5 rounded-full"
+                            className="h-full rounded-full bg-primary"
                             style={{ width: `${item.value}%` }}
                           />
                         </div>
@@ -215,27 +242,55 @@ export function Hero() {
                   </div>
                 </div>
 
+                {/* Coding round */}
                 <div className="flex-1 rounded-xl border border-border bg-card p-4">
-                  <p className="mb-2.5 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                    <Code2 className="size-3.5" />
-                    Coding Round
-                  </p>
-
-                  <div className="space-y-1.5 text-[11px] text-muted-foreground">
-                    <p className="flex items-center gap-1.5">
-                      <CheckCircle2 className="size-3.5 text-success" />
-                      Two Sum — solved
+                  <div className="mb-3 flex items-center justify-between">
+                    <p className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                      <Code2 className="size-3.5" />
+                      Coding round
                     </p>
 
-                    <p className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-medium text-muted-foreground">
+                      2 / 3
+                    </span>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between rounded-lg bg-muted/60 px-2.5 py-2">
+                      <span className="text-[11px] text-muted-foreground">
+                        Two Sum
+                      </span>
+
                       <CheckCircle2 className="size-3.5 text-success" />
-                      Time complexity explained
-                    </p>
+                    </div>
+
+                    <div className="flex items-center justify-between rounded-lg bg-muted/60 px-2.5 py-2">
+                      <span className="text-[11px] text-muted-foreground">
+                        Complexity explained
+                      </span>
+
+                      <CheckCircle2 className="size-3.5 text-success" />
+                    </div>
+
+                    <div className="flex items-center justify-between rounded-lg border border-border px-2.5 py-2">
+                      <span className="text-[11px] text-muted-foreground">
+                        Follow-up question
+                      </span>
+
+                      <span className="text-[10px] font-medium text-amber-600">
+                        Next
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Small caption */}
+          <p className="mt-4 text-center text-xs text-muted-foreground">
+            A realistic interview experience with feedback as you practice.
+          </p>
         </motion.div>
       </div>
     </section>
