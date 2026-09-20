@@ -1,10 +1,16 @@
 "use client";
 
-import { Code2, Mic, MessagesSquare, Type } from "lucide-react";
+import { Code2, LayoutGrid, Mic, MessagesSquare, Type } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 export const INTERVIEW_TYPES = [
+  {
+    value: "all",
+    label: "All Interviews",
+    description: "Show every interview you've generated",
+    icon: LayoutGrid,
+  },
   {
     value: "voice",
     label: "Voice Interview",
@@ -39,7 +45,7 @@ export function InterviewTypeSelector({
   onChange: (v: string) => void;
 }) {
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
       {INTERVIEW_TYPES.map((type) => (
         <button
           key={type.value}

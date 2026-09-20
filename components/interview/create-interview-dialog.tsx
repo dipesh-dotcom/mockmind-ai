@@ -152,7 +152,7 @@ export function CreateInterviewDialog({
       setOpen(false);
       reset();
       setStep(0);
-      router.push(`/practice/${data.id}`);
+      router.push(`/practice`);
     } catch {
       toast.error("Something went wrong. Please try again.");
     } finally {

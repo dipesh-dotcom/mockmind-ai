@@ -1,26 +1,59 @@
 "use client";
 
 import * as React from "react";
-import { ROLES } from "@/lib/mock-data/roles";
 import { PracticeFilters } from "@/components/practice/practice-filters";
 import { InterviewTypeSelector } from "@/components/practice/interview-type-selector";
-import { RoleGrid } from "@/components/practice/role-grid";
+import { InterviewGrid } from "@/components/practice/interview-grid";
 import { Reveal } from "@/components/shared/reveal";
+import type { InterviewSummary } from "@/types/interview";
+
+const TYPE_TO_ENUM: Record<string, InterviewSummary["type"]> = {
+  voice: "VOICE",
+  text: "TEXT",
+  coding: "CODING",
+  behavioral: "BEHAVIORAL",
+};
 
 export function PracticeClient() {
+  const [interviews, setInterviews] = React.useState<InterviewSummary[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const [search, setSearch] = React.useState("");
-  const [company, setCompany] = React.useState("Any company");
-  const [difficulty, setDifficulty] = React.useState("");
-  const [type, setType] = React.useState("voice");
+  const [experienceLevel, setExperienceLevel] = React.useState("");
+  const [type, setType] = React.useState("all");
 
-  const filtered = ROLES.filter((role) => {
-    const matchesSearch = role.title
-      .toLowerCase()
-      .includes(search.toLowerCase());
-    const matchesCompany =
-      company === "Any company" || role.company === company;
-    const matchesDifficulty = !difficulty || role.difficulty === difficulty;
-    return matchesSearch && matchesCompany && matchesDifficulty;
+  React.useEffect(() => {
+    let cancelled = false;
+
+    async function loadInterviews() {
+      setLoading(true);
+      try {
+        const res = await fetch("/api/interviews");
+        if (!res.ok) throw new Error("Failed to load interviews");
+        const data = (await res.json()) as { interviews: InterviewSummary[] };
+        if (!cancelled) setInterviews(data.interviews);
+      } catch {
+        if (!cancelled) setInterviews([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    loadInterviews();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const filtered = interviews.filter((interview) => {
+    const query = search.toLowerCase();
+    const matchesSearch =
+      !query ||
+      interview.title.toLowerCase().includes(query) ||
+      interview.jobTitle.toLowerCase().includes(query);
+    const matchesType = type === "all" || interview.type === TYPE_TO_ENUM[type];
+    const matchesExperience =
+      !experienceLevel || interview.experienceLevel === experienceLevel;
+    return matchesSearch && matchesType && matchesExperience;
   });
 
   return (
@@ -44,12 +77,10 @@ export function PracticeClient() {
         <PracticeFilters
           search={search}
           onSearchChange={setSearch}
-          company={company}
-          onCompanyChange={setCompany}
-          difficulty={difficulty}
-          onDifficultyChange={setDifficulty}
+          experienceLevel={experienceLevel}
+          onExperienceLevelChange={setExperienceLevel}
         />
-        <RoleGrid roles={filtered} />
+        <InterviewGrid interviews={filtered} loading={loading} />
       </div>
     </div>
   );

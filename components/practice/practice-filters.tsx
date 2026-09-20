@@ -1,49 +1,30 @@
 "use client";
 
-import * as React from "react";
 import { Search } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-const COMPANIES = [
-  "Any company",
-  "Google",
-  "Amazon",
-  "Stripe",
-  "Meta",
-  "Nimbus Inc.",
-  "Vertex Labs",
-];
-const DIFFICULTIES = [
-  { value: "beginner", label: "Beginner" },
-  { value: "intermediate", label: "Intermediate" },
-  { value: "advanced", label: "Advanced" },
+const EXPERIENCE_LEVELS = [
+  { value: "ENTRY", label: "Entry" },
+  { value: "JUNIOR", label: "Junior" },
+  { value: "MID", label: "Mid-level" },
+  { value: "SENIOR", label: "Senior" },
+  { value: "STAFF", label: "Staff" },
 ];
 
 export function PracticeFilters({
   search,
   onSearchChange,
-  company,
-  onCompanyChange,
-  difficulty,
-  onDifficultyChange,
+  experienceLevel,
+  onExperienceLevelChange,
 }: {
   search: string;
   onSearchChange: (v: string) => void;
-  company: string;
-  onCompanyChange: (v: string) => void;
-  difficulty: string;
-  onDifficultyChange: (v: string) => void;
+  experienceLevel: string;
+  onExperienceLevelChange: (v: string) => void;
 }) {
   return (
     <Card className="sticky top-24 h-fit">
@@ -52,7 +33,7 @@ export function PracticeFilters({
       </CardHeader>
       <CardContent className="space-y-5">
         <div className="space-y-2">
-          <Label htmlFor="role-search">Search role</Label>
+          <Label htmlFor="role-search">Search</Label>
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -65,46 +46,29 @@ export function PracticeFilters({
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Label>Company</Label>
-          <Select
-            value={company}
-            onValueChange={(value) => {
-              if (value) onCompanyChange(value);
-            }}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Any company" />
-            </SelectTrigger>
-            <SelectContent>
-              {COMPANIES.map((c) => (
-                <SelectItem key={c} value={c}>
-                  {c}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
         <div className="space-y-2.5">
-          <Label>Difficulty</Label>
+          <Label>Experience level</Label>
           <div className="flex flex-wrap gap-2">
-            {DIFFICULTIES.map((d) => (
+            {EXPERIENCE_LEVELS.map((lvl) => (
               <button
-                key={d.value}
+                key={lvl.value}
                 onClick={() =>
-                  onDifficultyChange(difficulty === d.value ? "" : d.value)
+                  onExperienceLevelChange(
+                    experienceLevel === lvl.value ? "" : lvl.value,
+                  )
                 }
                 type="button"
               >
                 <Badge
-                  variant={difficulty === d.value ? "gradient" : "outline"}
+                  variant={
+                    experienceLevel === lvl.value ? "gradient" : "outline"
+                  }
                   className={cn(
                     "cursor-pointer px-3 py-1.5 text-xs",
-                    difficulty === d.value && "border-0",
+                    experienceLevel === lvl.value && "border-0",
                   )}
                 >
-                  {d.label}
+                  {lvl.label}
                 </Badge>
               </button>
             ))}

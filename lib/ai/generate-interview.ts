@@ -29,11 +29,38 @@ type GenerateInterviewInput = {
 const questionCountFor = (minutes: number) =>
   Math.max(3, Math.min(12, Math.round(minutes / 6)));
 
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  maxRetries = 3,
+): Promise<Response> {
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const response = await fetch(url, options);
+
+    if (response.ok || ![429, 500, 502, 503].includes(response.status)) {
+      return response;
+    }
+
+    lastError = new Error(`AI request failed (${response.status})`);
+
+    if (attempt < maxRetries) {
+      const delayMs = 1000 * 2 ** attempt;
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    } else {
+      return response;
+    }
+  }
+
+  throw lastError;
+}
+
 export async function generateInterview(
   input: GenerateInterviewInput,
 ): Promise<GeneratedInterview> {
   const apiKey = process.env.AI_API_KEY;
-  const model = process.env.AI_MODEL ?? "gpt-4o-mini";
+  const model = process.env.AI_MODEL ?? "gemini-3.6-flash";
 
   if (!apiKey) {
     throw new Error("AI_API_KEY is not configured.");
@@ -68,22 +95,31 @@ Respond with ONLY valid JSON matching this shape:
     .filter(Boolean)
     .join("\n\n");
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
+  const response = await fetchWithRetry(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey,
+      },
+      body: JSON.stringify({
+        systemInstruction: {
+          parts: [{ text: systemPrompt }],
+        },
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: userPrompt || "Generate the interview." }],
+          },
+        ],
+        generationConfig: {
+          temperature: 0.7,
+          responseMimeType: "application/json",
+        },
+      }),
     },
-    body: JSON.stringify({
-      model,
-      response_format: { type: "json_object" },
-      temperature: 0.7,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt || "Generate the interview." },
-      ],
-    }),
-  });
+  );
 
   if (!response.ok) {
     const text = await response.text();
@@ -91,7 +127,7 @@ Respond with ONLY valid JSON matching this shape:
   }
 
   const data = await response.json();
-  const raw = data.choices?.[0]?.message?.content;
+  const raw = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
   if (!raw) {
     throw new Error("AI returned an empty response.");

@@ -4,6 +4,42 @@ import { prisma } from "@/lib/prisma";
 import { createInterviewSchema } from "@/schemas/interview.schema";
 import { generateInterview } from "@/lib/ai/generate-interview";
 
+export async function GET() {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const interviews = await prisma.interview.findMany({
+    where: {
+      userId: session.user.id,
+      status: "READY",
+    },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      title: true,
+      jobTitle: true,
+      type: true,
+      experienceLevel: true,
+      durationMinutes: true,
+      focusAreas: true,
+      status: true,
+      createdAt: true,
+      _count: { select: { questions: true } },
+    },
+  });
+
+  const data = interviews.map(({ _count, createdAt, ...rest }) => ({
+    ...rest,
+    questionCount: _count.questions,
+    createdAt: createdAt.toISOString(),
+  }));
+
+  return NextResponse.json({ interviews: data });
+}
+
 export async function POST(req: NextRequest) {
   const session = await auth();
 
@@ -63,6 +99,8 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    let generatedTitle: string | undefined;
+
     try {
       const generated = await generateInterview({
         jobTitle,
@@ -73,6 +111,8 @@ export async function POST(req: NextRequest) {
         focusAreas,
         resumeText,
       });
+
+      generatedTitle = generated.title;
 
       await prisma.$transaction([
         prisma.interviewQuestion.createMany({
@@ -105,12 +145,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json({ id: interview.id }, { status: 201 });
+    return NextResponse.json(
+      {
+        id: interview.id,
+        title: generatedTitle ?? interview.title,
+        jobTitle,
+        type,
+        experienceLevel,
+        durationMinutes,
+        focusAreas,
+        status: "READY",
+        questionCount: focusAreas ? undefined : undefined,
+      },
+      { status: 201 },
+    );
   } catch (error) {
     console.error(error);
-    console.log(error);
     return NextResponse.json(
-      { error: `Something went wrong creating your interview: ${error}` },
+      { error: "Something went wrong creating your interview." },
       { status: 500 },
     );
   }
