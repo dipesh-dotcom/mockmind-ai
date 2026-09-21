@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, Menu, Plus, Search } from "lucide-react";
+import { Bell, LogOut, Menu, Plus, Search, User } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -23,9 +23,11 @@ import {
 import { NotificationsPanel } from "./notifications-panel";
 import { cn } from "@/lib/utils";
 import { CreateInterviewDialog } from "../interview/create-interview-dialog";
+import { signOut, useSession } from "next-auth/react";
 
 export function DashboardTopNav({ title }: { title?: string }) {
   const { setMobileOpen } = useSidebar();
+  const { data: session } = useSession();
 
   return (
     <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-3 border-b border-border bg-card/80 px-4 backdrop-blur-md sm:px-6">
@@ -84,31 +86,53 @@ export function DashboardTopNav({ title }: { title?: string }) {
         </Popover>
 
         <DropdownMenu>
-          <DropdownMenuTrigger className="ml-1 rounded-full outline-none ring-offset-2 ring-offset-background focus-visible:ring-2 focus-visible:ring-ring">
-            <Avatar>
-              <AvatarFallback>JL</AvatarFallback>
+          <DropdownMenuTrigger className="inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-accent">
+            <Avatar className="h-10 w-10">
+              <AvatarImage
+                src={session.user?.image ?? ""}
+                alt={session.user?.name ?? ""}
+              />
+
+              <AvatarFallback>
+                {session.user?.name
+                  ?.split(" ")
+                  .map((word) => word[0])
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase()}
+              </AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>
-              <p className="text-sm font-medium text-foreground">Jordan Lee</p>
-              <p className="text-xs font-normal text-muted-foreground">
-                jordan@example.com
+
+          <DropdownMenuContent align="end" className="w-64">
+            <div className="px-3 py-2">
+              <p className="font-medium">{session?.user?.name}</p>
+              <p className="text-xs text-muted-foreground">
+                {session?.user?.email}
               </p>
-            </DropdownMenuLabel>
+            </div>
+
             <DropdownMenuSeparator />
+
             <DropdownMenuItem>
-              <Link href="/profile">Profile</Link>
+              <Link href="/profile">
+                <User className="mr-2 h-4 w-4" />
+                Profile
+              </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href="/profile?tab=settings">Settings</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href="/profile?tab=billing">Billing</Link>
-            </DropdownMenuItem>
+
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Link href="/">Sign out</Link>
+
+            <DropdownMenuItem
+              className="text-destructive"
+              onClick={() =>
+                signOut({
+                  callbackUrl: "/",
+                })
+              }
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Sign out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

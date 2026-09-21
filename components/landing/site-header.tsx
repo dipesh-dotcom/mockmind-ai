@@ -21,7 +21,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -106,13 +105,6 @@ export function SiteHeader() {
                   </div>
 
                   <DropdownMenuSeparator />
-
-                  <DropdownMenuItem>
-                    <Link href="/dashboard">
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
-                      Dashboard
-                    </Link>
-                  </DropdownMenuItem>
 
                   <DropdownMenuItem>
                     <Link href="/profile">
