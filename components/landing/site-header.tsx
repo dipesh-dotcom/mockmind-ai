@@ -78,15 +78,14 @@ export function SiteHeader() {
               </Link>
 
               <DropdownMenu>
-                <DropdownMenuTrigger className="inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-accent">
-                  <Avatar className="h-10 w-10">
+                <DropdownMenuTrigger className="inline-flex rounded-full ring-offset-2 ring-offset-background transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50">
+                  <Avatar className="h-10 w-10 ring-2 ring-border transition-colors hover:ring-primary/40">
                     <AvatarImage
-                      src={session.user?.image ?? ""}
-                      alt={session.user?.name ?? ""}
+                      src={session?.user?.image ?? ""}
+                      alt={session?.user?.name ?? ""}
                     />
-
-                    <AvatarFallback>
-                      {session.user?.name
+                    <AvatarFallback className="gradient-brand text-sm font-medium text-white">
+                      {session?.user?.name
                         ?.split(" ")
                         .map((word) => word[0])
                         .join("")
@@ -96,34 +95,51 @@ export function SiteHeader() {
                   </Avatar>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent align="end" className="w-64">
-                  <div className="px-3 py-2">
-                    <p className="font-medium">{session.user?.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {session.user?.email}
-                    </p>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-64 rounded-2xl p-2"
+                >
+                  <div className="flex items-center gap-3 px-2 py-2.5">
+                    <Avatar className="h-9 w-9 shrink-0">
+                      <AvatarImage
+                        src={session?.user?.image ?? ""}
+                        alt={session?.user?.name ?? ""}
+                      />
+                      <AvatarFallback className="gradient-brand text-xs font-medium text-white">
+                        {session?.user?.name
+                          ?.split(" ")
+                          .map((word) => word[0])
+                          .join("")
+                          .slice(0, 2)
+                          .toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <p className="truncate font-display text-sm font-semibold leading-tight">
+                        {session?.user?.name}
+                      </p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {session?.user?.email}
+                      </p>
+                    </div>
                   </div>
 
-                  <DropdownMenuSeparator />
+                  <DropdownMenuSeparator className="my-1.5" />
 
-                  <DropdownMenuItem>
-                    <Link href="/profile">
-                      <User className="mr-2 h-4 w-4" />
+                  <DropdownMenuItem className="rounded-lg px-2 py-2 text-sm">
+                    <Link href="/profile" className="flex items-center gap-2.5">
+                      <User className="size-4 text-muted-foreground" />
                       Profile
                     </Link>
                   </DropdownMenuItem>
 
-                  <DropdownMenuSeparator />
+                  <DropdownMenuSeparator className="my-1.5" />
 
                   <DropdownMenuItem
-                    className="text-destructive"
-                    onClick={() =>
-                      signOut({
-                        callbackUrl: "/",
-                      })
-                    }
+                    className="gap-2.5 rounded-lg px-2 py-2 text-sm text-destructive focus:bg-destructive/10 focus:text-destructive"
+                    onClick={() => signOut({ callbackUrl: "/" })}
                   >
-                    <LogOut className="mr-2 h-4 w-4" />
+                    <LogOut className="size-4" />
                     Sign out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
