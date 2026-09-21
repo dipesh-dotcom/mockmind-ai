@@ -24,6 +24,7 @@ import { NotificationsPanel } from "./notifications-panel";
 import { cn } from "@/lib/utils";
 import { CreateInterviewDialog } from "../interview/create-interview-dialog";
 import { signOut, useSession } from "next-auth/react";
+import { AvatarImage } from "@/components/ui/avatar";
 
 export function DashboardTopNav({ title }: { title?: string }) {
   const { setMobileOpen } = useSidebar();
@@ -89,12 +90,12 @@ export function DashboardTopNav({ title }: { title?: string }) {
           <DropdownMenuTrigger className="inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-accent">
             <Avatar className="h-10 w-10">
               <AvatarImage
-                src={session.user?.image ?? ""}
-                alt={session.user?.name ?? ""}
+                src={session?.user?.image ?? ""}
+                alt={session?.user?.name ?? ""}
               />
 
               <AvatarFallback>
-                {session.user?.name
+                {session?.user?.name
                   ?.split(" ")
                   .map((word) => word[0])
                   .join("")
