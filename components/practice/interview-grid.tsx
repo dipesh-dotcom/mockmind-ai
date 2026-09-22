@@ -9,9 +9,11 @@ import type { InterviewSummary } from "@/types/interview";
 export function InterviewGrid({
   interviews,
   loading,
+  onDeleted,
 }: {
   interviews: InterviewSummary[];
   loading: boolean;
+  onDeleted?: (id: string) => void;
 }) {
   if (loading) {
     return (
@@ -40,7 +42,7 @@ export function InterviewGrid({
     <RevealGroup className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {interviews.map((interview) => (
         <RevealItem key={interview.id}>
-          <InterviewCard interview={interview} />
+          <InterviewCard interview={interview} onDeleted={onDeleted} />
         </RevealItem>
       ))}
     </RevealGroup>

@@ -311,6 +311,8 @@ export function LiveInterviewClient({ interviewId }: { interviewId: string }) {
             type={interview.type}
             recording={recording}
             onToggleRecording={toggleRecording}
+            expectedAnswer={currentQuestion?.expectedAnswer}
+            hints={currentQuestion?.hints}
           />
         </div>
       </div>

@@ -56,6 +56,10 @@ export function PracticeClient() {
     return matchesSearch && matchesType && matchesExperience;
   });
 
+  function handleDeleted(id: string) {
+    setInterviews((prev) => prev.filter((interview) => interview.id !== id));
+  }
+
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6">
       <Reveal>
@@ -80,7 +84,11 @@ export function PracticeClient() {
           experienceLevel={experienceLevel}
           onExperienceLevelChange={setExperienceLevel}
         />
-        <InterviewGrid interviews={filtered} loading={loading} />
+        <InterviewGrid
+          interviews={filtered}
+          loading={loading}
+          onDeleted={handleDeleted}
+        />
       </div>
     </div>
   );

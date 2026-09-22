@@ -1,7 +1,17 @@
 "use client";
 
+import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Clock, ListChecks, Play } from "lucide-react";
+import { toast } from "sonner";
+import {
+  Check,
+  Clock,
+  ListChecks,
+  Loader2,
+  Play,
+  Trash2,
+  X,
+} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,14 +26,48 @@ const EXPERIENCE_STYLE: Record<string, "success" | "warning" | "destructive"> =
     STAFF: "destructive",
   };
 
-export function InterviewCard({ interview }: { interview: InterviewSummary }) {
+export function InterviewCard({
+  interview,
+  onDeleted,
+}: {
+  interview: InterviewSummary;
+  onDeleted?: (id: string) => void;
+}) {
   const router = useRouter();
+  const [confirming, setConfirming] = React.useState(false);
+  const [deleting, setDeleting] = React.useState(false);
 
   const hasTags = interview.focusAreas.length > 0;
   const hasQuestions = interview.questionCount > 0;
   const MAX_VISIBLE_TAGS = 4;
   const visibleTags = interview.focusAreas.slice(0, MAX_VISIBLE_TAGS);
   const remainingTagCount = interview.focusAreas.length - visibleTags.length;
+
+  async function handleDelete(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (deleting) return;
+    setDeleting(true);
+
+    try {
+      const res = await fetch(`/api/interviews/${interview.id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        toast.error(data.error ?? "Couldn't delete this interview.");
+        return;
+      }
+
+      toast.success("Interview deleted.");
+      onDeleted?.(interview.id);
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setDeleting(false);
+      setConfirming(false);
+    }
+  }
 
   return (
     <Card className="flex h-full flex-col p-5 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/5">
@@ -36,12 +80,63 @@ export function InterviewCard({ interview }: { interview: InterviewSummary }) {
             {interview.jobTitle}
           </p>
         </div>
-        <Badge
-          variant={EXPERIENCE_STYLE[interview.experienceLevel] ?? "secondary"}
-          className="shrink-0 px-3 py-1 text-xs capitalize"
-        >
-          {interview.experienceLevel.toLowerCase()}
-        </Badge>
+
+        <div className="flex shrink-0 items-center gap-1.5">
+          <Badge
+            variant={EXPERIENCE_STYLE[interview.experienceLevel] ?? "secondary"}
+            className="px-3 py-1 text-xs capitalize"
+          >
+            {interview.experienceLevel.toLowerCase()}
+          </Badge>
+
+          {!confirming ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-7 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+              onClick={(e) => {
+                e.stopPropagation();
+                setConfirming(true);
+              }}
+              aria-label="Delete interview"
+            >
+              <Trash2 className="size-3.5" />
+            </Button>
+          ) : (
+            <div className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="size-7 text-destructive hover:bg-destructive/10"
+                onClick={handleDelete}
+                disabled={deleting}
+                aria-label="Confirm delete"
+              >
+                {deleting ? (
+                  <Loader2 className="size-3.5 animate-spin" />
+                ) : (
+                  <Check className="size-3.5" />
+                )}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="size-7 text-muted-foreground"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setConfirming(false);
+                }}
+                disabled={deleting}
+                aria-label="Cancel delete"
+              >
+                <X className="size-3.5" />
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
 
       {hasTags && (

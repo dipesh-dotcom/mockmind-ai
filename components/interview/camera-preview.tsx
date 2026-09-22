@@ -1,49 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { Camera, CameraOff, Mic, MicOff, Video } from "lucide-react";
+import { Mic, MicOff } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-export function CameraPreview() {
-  const [cameraOn, setCameraOn] = React.useState(true);
-
-  return (
-    <Card className="overflow-hidden p-0">
-      <div className="relative flex aspect-video items-center justify-center bg-[#0d1117]">
-        {cameraOn ? (
-          <div className="flex flex-col items-center gap-2.5 text-zinc-500">
-            <Video className="size-10" />
-            <p className="text-sm">Camera preview</p>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center gap-2.5 text-zinc-600">
-            <CameraOff className="size-10" />
-            <p className="text-sm">Camera is off</p>
-          </div>
-        )}
-        <span className="absolute left-3 top-3 rounded-md bg-black/50 px-2.5 py-1 text-xs font-medium text-white">
-          You
-        </span>
-      </div>
-      <div className="flex items-center justify-center gap-2 p-4">
-        <Button
-          variant={cameraOn ? "outline" : "destructive"}
-          onClick={() => setCameraOn((c) => !c)}
-          aria-label="Toggle camera"
-          className="size-11 rounded-full p-0"
-        >
-          {cameraOn ? (
-            <Camera className="size-5" />
-          ) : (
-            <CameraOff className="size-5" />
-          )}
-        </Button>
-      </div>
-    </Card>
-  );
-}
 
 export function VoiceControls({
   recording,
