@@ -2,11 +2,12 @@
 
 import * as React from "react";
 import { Send, Sparkles } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { useSession } from "next-auth/react";
 
 export type ChatMessage = {
   id: string;
@@ -25,7 +26,7 @@ export function ChatPanel({
 }) {
   const [draft, setDraft] = React.useState("");
   const endRef = React.useRef<HTMLDivElement>(null);
-
+  const { data: session } = useSession();
   React.useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length]);
@@ -49,16 +50,18 @@ export function ChatPanel({
                 m.role === "user" && "flex-row-reverse",
               )}
             >
-              <Avatar className="size-9 shrink-0">
-                <AvatarFallback
-                  className={cn(
-                    "text-sm",
-                    m.role === "ai"
-                      ? "gradient-brand text-white"
-                      : "bg-muted text-foreground",
-                  )}
-                >
-                  {m.role === "ai" ? <Sparkles className="size-4.5" /> : "JL"}
+              <Avatar className="h-9 w-9 shrink-0">
+                <AvatarImage
+                  src={session?.user?.image ?? ""}
+                  alt={session?.user?.name ?? ""}
+                />
+                <AvatarFallback className="gradient-brand text-xs font-medium text-white">
+                  {session?.user?.name
+                    ?.split(" ")
+                    .map((word) => word[0])
+                    .join("")
+                    .slice(0, 2)
+                    .toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div
