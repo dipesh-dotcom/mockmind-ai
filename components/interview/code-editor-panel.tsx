@@ -27,15 +27,15 @@ export function CodeEditorPanel({
 
   return (
     <Card className="flex h-full flex-col overflow-hidden rounded-none border-0 p-0">
-      <div className="border-b border-border bg-muted/40 px-4 py-3">
+      <div className="border-b border-border bg-muted/40 px-5 py-4">
         <p className="text-sm leading-relaxed">{question}</p>
       </div>
 
-      <div className="flex items-center justify-between border-b border-border bg-muted/40 px-4 py-2.5">
-        <div className="flex items-center gap-1.5">
-          <span className="size-2.5 rounded-full bg-destructive/60" />
-          <span className="size-2.5 rounded-full bg-warning/60" />
-          <span className="size-2.5 rounded-full bg-success/60" />
+      <div className="flex items-center justify-between border-b border-border bg-muted/40 px-5 py-3">
+        <div className="flex items-center gap-2">
+          <span className="size-3 rounded-full bg-destructive/60" />
+          <span className="size-3 rounded-full bg-warning/60" />
+          <span className="size-3 rounded-full bg-success/60" />
         </div>
         <Select
           value={language}
@@ -43,7 +43,7 @@ export function CodeEditorPanel({
             if (value) setLanguage(value);
           }}
         >
-          <SelectTrigger className="h-8 w-36 text-xs">
+          <SelectTrigger className="h-9 w-40 text-sm">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -59,19 +59,20 @@ export function CodeEditorPanel({
         value={code}
         onChange={(e) => setCode(e.target.value)}
         spellCheck={false}
-        className="min-h-[220px] flex-1 resize-none bg-[#0d1117] p-4 font-mono text-[13px] leading-relaxed text-zinc-200 outline-none"
+        className="min-h-[280px] flex-1 resize-none bg-[#0d1117] p-5 font-mono text-sm leading-relaxed text-zinc-200 outline-none"
       />
 
-      <div className="flex items-center justify-between border-t border-border px-4 py-2.5">
-        <Badge variant="secondary" className="gap-1.5 text-[11px]">
-          <Terminal className="size-3" /> No live runtime — scored by AI review
-        </Badge>
+      <div className="flex items-center justify-between border-t border-border px-5 py-3.5">
+        <div className="flex items-center gap-2 rounded-lg bg-muted/60 px-3 py-2 text-xs text-muted-foreground">
+          <Terminal className="size-3.5 shrink-0 text-muted-foreground/70" />
+          <span>No live runtime — scored by AI review</span>
+        </div>
         <Button
-          size="sm"
+          size="default"
           onClick={() => onSubmit(code, language)}
           disabled={submitting || !code.trim()}
         >
-          <Send className="size-3.5" />{" "}
+          <Send className="size-4" />{" "}
           {submitting ? "Scoring..." : "Submit answer"}
         </Button>
       </div>

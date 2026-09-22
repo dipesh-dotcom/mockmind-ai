@@ -15,6 +15,33 @@ export type AnswerScore = {
   semanticSimilarity: number;
 };
 
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  maxRetries = 4,
+): Promise<Response> {
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const response = await fetch(url, options);
+
+    if (response.ok || ![500, 502, 503].includes(response.status)) {
+      return response;
+    }
+
+    lastError = new Error(`AI request failed (${response.status})`);
+
+    if (attempt < maxRetries) {
+      const delayMs = 1000 * 2 ** attempt; // 1s, 2s, 4s, 8s
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    } else {
+      return response;
+    }
+  }
+
+  throw lastError;
+}
+
 function cosineSimilarity(a: number[], b: number[]): number {
   let dot = 0;
   let normA = 0;
@@ -29,7 +56,7 @@ function cosineSimilarity(a: number[], b: number[]): number {
 }
 
 async function embedText(apiKey: string, text: string): Promise<number[]> {
-  const response = await fetch(
+  const response = await fetchWithRetry(
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent",
     {
       method: "POST",
@@ -88,7 +115,7 @@ Candidate's answer: ${params.transcript}
 
 Computed semantic similarity to expected answer: ${params.semanticSimilarity}/100`;
 
-  const response = await fetch(
+  const response = await fetchWithRetry(
     `https://generativelanguage.googleapis.com/v1beta/models/${params.model}:generateContent`,
     {
       method: "POST",

@@ -39,28 +39,31 @@ export function ChatPanel({
 
   return (
     <div className="flex h-full flex-col">
-      <ScrollArea className="flex-1 px-4 py-4 sm:px-6">
-        <div className="flex flex-col gap-4">
+      <ScrollArea className="flex-1 px-4 py-5 sm:px-6">
+        <div className="flex flex-col gap-5">
           {messages.map((m) => (
             <div
               key={m.id}
               className={cn(
-                "flex items-start gap-2.5",
+                "flex items-start gap-3",
                 m.role === "user" && "flex-row-reverse",
               )}
             >
-              <Avatar className="size-8 shrink-0">
+              <Avatar className="size-9 shrink-0">
                 <AvatarFallback
                   className={cn(
-                    m.role === "ai" ? "" : "bg-muted text-foreground",
+                    "text-sm",
+                    m.role === "ai"
+                      ? "gradient-brand text-white"
+                      : "bg-muted text-foreground",
                   )}
                 >
-                  {m.role === "ai" ? <Sparkles className="size-4" /> : "JL"}
+                  {m.role === "ai" ? <Sparkles className="size-4.5" /> : "JL"}
                 </AvatarFallback>
               </Avatar>
               <div
                 className={cn(
-                  "max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
+                  "max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
                   m.role === "ai"
                     ? "rounded-tl-sm bg-muted text-foreground"
                     : "rounded-tr-sm gradient-brand text-white",
@@ -76,22 +79,22 @@ export function ChatPanel({
 
       <form
         onSubmit={handleSubmit}
-        className="flex items-center gap-2 border-t border-border p-3 sm:p-4"
+        className="flex items-center gap-2.5 border-t border-border p-4 sm:p-5"
       >
         <Input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           placeholder="Type your response..."
           disabled={disabled}
-          className="h-11"
+          className="h-12 text-sm"
         />
         <Button
           type="submit"
           size="icon"
-          className="h-11 w-11 shrink-0"
+          className="h-12 w-12 shrink-0 rounded-full"
           disabled={disabled}
         >
-          <Send className="size-4" />
+          <Send className="size-4.5" />
         </Button>
       </form>
     </div>

@@ -1,37 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, LogOut, Menu, Plus, Search, User } from "lucide-react";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { LogOut, Menu, Plus, Search, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { useSidebar } from "@/components/dashboard/sidebar-context";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
-import { NotificationsPanel } from "./notifications-panel";
-import { cn } from "@/lib/utils";
+
 import { CreateInterviewDialog } from "../interview/create-interview-dialog";
 import { signOut, useSession } from "next-auth/react";
-import { AvatarImage } from "@/components/ui/avatar";
 
 export function DashboardTopNav({ title }: { title?: string }) {
   const { setMobileOpen } = useSidebar();
   const { data: session } = useSession();
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-3 border-b border-border bg-card/80 px-4 backdrop-blur-md sm:px-6">
+    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-4 border-b border-border bg-card/80 px-4 backdrop-blur-md sm:gap-6 sm:px-6 lg:px-8">
       <Button
         variant="ghost"
         size="icon"
@@ -48,7 +40,7 @@ export function DashboardTopNav({ title }: { title?: string }) {
         </h1>
       )}
 
-      <div className="relative ml-auto hidden max-w-sm flex-1 sm:block">
+      <div className="relative ml-auto hidden max-w-sm flex-1 sm:block lg:max-w-md">
         <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="Search roles, questions, courses..."
@@ -56,39 +48,26 @@ export function DashboardTopNav({ title }: { title?: string }) {
         />
       </div>
 
-      <div className="ml-auto flex items-center gap-1.5 sm:ml-0">
+      <div className="ml-auto flex items-center gap-1 sm:ml-0">
         <CreateInterviewDialog
           trigger={
             <Button
-              size="sm"
-              className="hidden gap-1.5 rounded-full gradient-brand text-white shadow-sm shadow-primary/20 transition-transform hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary/25 sm:inline-flex"
+              variant="ghost"
+              size="icon"
+              className="inline-flex items-center justify-center gap-1.5 rounded-full gradient-brand text-white shadow-sm shadow-primary/20 transition-transform hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary/25 sm:h-9 sm:w-auto sm:px-4"
+              aria-label="New interview"
             >
               <Plus className="size-4" />
-              New interview
+              <span className="hidden sm:inline">New interview</span>
             </Button>
           }
         />
 
-        <ThemeToggle className="border-0" />
+        <div className="mx-1 flex items-center gap-1">
+          <ThemeToggle className="border-0" />
+        </div>
 
-        <Popover>
-          <PopoverTrigger
-            className={cn(
-              buttonVariants({
-                variant: "ghost",
-                size: "icon",
-              }),
-              "relative border-0",
-            )}
-            aria-label="Notifications"
-          >
-            <Bell className="size-4.5" />
-            <span className="absolute right-2 top-2 flex size-2 rounded-full bg-accent" />
-          </PopoverTrigger>
-          <PopoverContent align="end" className="w-80 p-0">
-            <NotificationsPanel />
-          </PopoverContent>
-        </Popover>
+        <span className="mx-1 hidden h-6 w-px bg-border sm:block" />
 
         <DropdownMenu>
           <DropdownMenuTrigger className="inline-flex rounded-full ring-offset-2 ring-offset-background transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50">

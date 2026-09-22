@@ -36,6 +36,12 @@ enum InterviewStatus {
   FAILED
 }
 
+enum SuggestionPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
 model User {
   id            String       @id @default(uuid())
   email         String       @unique

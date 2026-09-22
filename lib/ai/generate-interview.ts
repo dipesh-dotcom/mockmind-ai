@@ -32,7 +32,7 @@ const questionCountFor = (minutes: number) =>
 async function fetchWithRetry(
   url: string,
   options: RequestInit,
-  maxRetries = 3,
+  maxRetries = 4,
 ): Promise<Response> {
   let lastError: unknown;
 
@@ -46,7 +46,7 @@ async function fetchWithRetry(
     lastError = new Error(`AI request failed (${response.status})`);
 
     if (attempt < maxRetries) {
-      const delayMs = 1000 * 2 ** attempt;
+      const delayMs = 1000 * 2 ** attempt; // 1s, 2s, 4s, 8s
       await new Promise((resolve) => setTimeout(resolve, delayMs));
     } else {
       return response;
