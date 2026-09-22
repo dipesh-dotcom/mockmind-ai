@@ -130,6 +130,23 @@ export function CreateInterviewDialog({
     setStep((s) => Math.max(s - 1, 0));
   }
 
+  // Prevents native Enter-key form submission from firing early.
+  // Without this, pressing Enter in the job title / duration inputs
+  // submits the form immediately, regardless of which step is showing.
+  function handleFormKeyDown(e: React.KeyboardEvent<HTMLFormElement>) {
+    if (e.key !== "Enter") return;
+    const target = e.target as HTMLElement;
+
+    if (target.tagName === "TEXTAREA") return;
+
+    if (step < STEPS.length - 1) {
+      e.preventDefault();
+      handleNext();
+    } else if (submitting) {
+      e.preventDefault();
+    }
+  }
+
   const onSubmit: SubmitHandler<CreateInterviewInput> = async (values) => {
     if (submitting) return;
     setSubmitting(true);
@@ -152,6 +169,11 @@ export function CreateInterviewDialog({
       setOpen(false);
       reset();
       setStep(0);
+
+      window.dispatchEvent(
+        new CustomEvent("interview-created", { detail: data }),
+      );
+
       router.push(`/practice`);
     } catch {
       toast.error("Something went wrong. Please try again.");
@@ -230,7 +252,11 @@ export function CreateInterviewDialog({
           ))}
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          onKeyDown={handleFormKeyDown}
+          className="space-y-5"
+        >
           {step === 0 && (
             <div className="space-y-4">
               <div className="space-y-2">
@@ -254,7 +280,7 @@ export function CreateInterviewDialog({
                 <Textarea
                   id="jobDescription"
                   placeholder="Paste the job description for a more tailored interview..."
-                  className="min-h-28"
+                  className="min-h-28 max-h-56 resize-none overflow-y-auto"
                   {...register("jobDescription")}
                 />
               </div>
@@ -381,7 +407,7 @@ export function CreateInterviewDialog({
                 <Textarea
                   id="resumeText"
                   placeholder="Paste your resume text so the AI can tailor questions to your background..."
-                  className="min-h-32"
+                  className="min-h-28 max-h-56 resize-none overflow-y-auto"
                   {...register("resumeText")}
                 />
               </div>
