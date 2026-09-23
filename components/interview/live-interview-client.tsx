@@ -8,6 +8,7 @@ import { ChatPanel, type ChatMessage } from "@/components/interview/chat-panel";
 import { CodeEditorPanel } from "@/components/interview/code-editor-panel";
 import { SessionHeader } from "@/components/interview/session-header";
 import { SidePanels } from "@/components/interview/side-panels";
+import { InterviewResults } from "./interview-results";
 
 type QuestionWithAnswer = {
   id: string;
@@ -17,6 +18,7 @@ type QuestionWithAnswer = {
   expectedAnswer: string | null;
   hints: string[];
   followUps: string[];
+
   answer: {
     transcript: string | null;
     score: number | null;
@@ -52,85 +54,100 @@ export function LiveInterviewClient({ interviewId }: { interviewId: string }) {
   const [recording, setRecording] = React.useState(false);
   const recognitionRef = React.useRef<any>(null);
 
+  const loadInterview = React.useCallback(async () => {
+    const res = await fetch(`/api/interviews/${interviewId}`, {
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      throw new Error("Failed to load interview");
+    }
+    const data = (await res.json()) as {
+      interview: InterviewDetail;
+    };
+    const loadedInterview = data.interview;
+    setInterview(loadedInterview);
+    const firstUnanswered = loadedInterview.questions.findIndex(
+      (question) => !question.answer,
+    );
+    const startIndex =
+      firstUnanswered === -1
+        ? loadedInterview.questions.length
+        : firstUnanswered;
+    setCurrentIndex(startIndex);
+    const allAnswered =
+      loadedInterview.questions.length > 0 &&
+      loadedInterview.questions.every((question) => question.answer != null);
+    setFinished(allAnswered);
+
+    if (loadedInterview.type !== "CODING") {
+      const seededMessages: ChatMessage[] = [];
+      for (const question of loadedInterview.questions) {
+        seededMessages.push({
+          id: `q-${question.id}`,
+          role: "ai",
+          content: question.question,
+        });
+        if (question.answer?.transcript) {
+          seededMessages.push({
+            id: `a-${question.id}`,
+            role: "user",
+            content: question.answer.transcript,
+          });
+          if (question.answer.feedback) {
+            seededMessages.push({
+              id: `f-${question.id}`,
+              role: "ai",
+              content: `Score: ${
+                question.answer.score ?? 0
+              }/100 — ${question.answer.feedback}`,
+            });
+          }
+        }
+      }
+      setMessages(seededMessages);
+    }
+    return loadedInterview;
+  }, [interviewId]);
+
   React.useEffect(() => {
     let cancelled = false;
-
     async function load() {
       setLoading(true);
       try {
-        const res = await fetch(`/api/interviews/${interviewId}`);
-        if (!res.ok) throw new Error("Failed to load interview");
-        const data = (await res.json()) as { interview: InterviewDetail };
         if (cancelled) return;
-
-        setInterview(data.interview);
-
-        const firstUnanswered = data.interview.questions.findIndex(
-          (q) => !q.answer,
-        );
-        const startIndex =
-          firstUnanswered === -1
-            ? data.interview.questions.length
-            : firstUnanswered;
-        setCurrentIndex(startIndex);
-
-        if (startIndex >= data.interview.questions.length) {
-          setFinished(true);
+        await loadInterview();
+      } catch (error) {
+        console.error("Load interview error:", error);
+        if (!cancelled) {
+          toast.error("Couldn't load this interview.");
         }
-
-        if (data.interview.type !== "CODING") {
-          const seeded: ChatMessage[] = [];
-          const upTo = Math.min(
-            startIndex,
-            data.interview.questions.length - 1,
-          );
-          for (let i = 0; i <= upTo; i++) {
-            const q = data.interview.questions[i];
-            seeded.push({ id: `q-${q.id}`, role: "ai", content: q.question });
-            if (q.answer?.transcript) {
-              seeded.push({
-                id: `a-${q.id}`,
-                role: "user",
-                content: q.answer.transcript,
-              });
-              if (q.answer.feedback) {
-                seeded.push({
-                  id: `f-${q.id}`,
-                  role: "ai",
-                  content: `Score: ${q.answer.score}/100 — ${q.answer.feedback}`,
-                });
-              }
-            }
-          }
-          setMessages(seeded);
-        }
-      } catch {
-        if (!cancelled) toast.error("Couldn't load this interview.");
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
-
     load();
     return () => {
       cancelled = true;
     };
-  }, [interviewId]);
+  }, [loadInterview]);
 
-  // Speech recognition setup for VOICE interviews
   React.useEffect(() => {
-    if (interview?.type !== "VOICE") return;
-
+    if (interview?.type !== "VOICE") {
+      return;
+    }
     const SpeechRecognition =
       (window as any).SpeechRecognition ||
       (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) return;
 
+    if (!SpeechRecognition) {
+      return;
+    }
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = false;
     recognition.lang = "en-US";
-
     let accumulated = "";
 
     recognition.onresult = (event: any) => {
@@ -143,8 +160,11 @@ export function LiveInterviewClient({ interviewId }: { interviewId: string }) {
 
     recognition.onend = () => {
       setRecording(false);
+
       const finalTranscript = accumulated.trim();
+
       accumulated = "";
+
       if (finalTranscript) {
         submitAnswer(finalTranscript);
       }
@@ -153,87 +173,141 @@ export function LiveInterviewClient({ interviewId }: { interviewId: string }) {
     recognitionRef.current = recognition;
 
     return () => {
-      recognition.stop();
+      try {
+        recognition.stop();
+      } catch {
+        // Recognition may already be stopped.
+      }
+
+      recognitionRef.current = null;
     };
+
+    // submitAnswer intentionally omitted because this effect
+    // should restart when the interview question changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [interview?.type, currentIndex]);
 
+  /*
+   * Start / stop voice recording.
+   */
   function toggleRecording() {
     if (!recognitionRef.current) {
       toast.error("Speech recognition isn't supported in this browser.");
+
       return;
     }
+
     if (recording) {
       recognitionRef.current.stop();
+      setRecording(false);
     } else {
-      recognitionRef.current.start();
-      setRecording(true);
+      try {
+        recognitionRef.current.start();
+        setRecording(true);
+      } catch (error) {
+        console.error("Speech recognition start error:", error);
+
+        toast.error("Couldn't start voice recording.");
+      }
     }
   }
 
   const currentQuestion = interview?.questions[currentIndex];
 
+  /*
+   * Submit the current answer.
+   */
   async function submitAnswer(transcript: string) {
-    if (!interview || !currentQuestion || submitting) return;
+    if (!interview || !currentQuestion || submitting) {
+      return;
+    }
+
+    const trimmedTranscript = transcript.trim();
+
+    if (!trimmedTranscript) {
+      toast.error("Please provide an answer.");
+
+      return;
+    }
+
     setSubmitting(true);
 
     try {
+      /*
+       * Save and score the answer.
+       */
       const res = await fetch(`/api/interviews/${interview.id}/answers`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ questionId: currentQuestion.id, transcript }),
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          questionId: currentQuestion.id,
+          transcript: trimmedTranscript,
+        }),
       });
 
       const data = (await res.json()) as {
-        answer?: { score: number | null; feedback: string | null };
+        answer?: {
+          score: number | null;
+          feedback: string | null;
+        };
+
         completed?: boolean;
+
         error?: string;
       };
 
+      /*
+       * Handle API errors.
+       */
       if (!res.ok || !data.answer) {
         toast.error(data.error ?? "Couldn't score your answer.");
+
         return;
       }
 
-      if (interview.type !== "CODING") {
-        setMessages((prev) => [
-          ...prev,
-          { id: `a-${currentQuestion.id}`, role: "user", content: transcript },
-          {
-            id: `f-${currentQuestion.id}`,
-            role: "ai",
-            content: `Score: ${data.answer!.score}/100 — ${data.answer!.feedback}`,
-          },
-        ]);
-      } else {
-        toast.success(`Scored ${data.answer.score}/100`);
-      }
+      /*
+       * IMPORTANT:
+       *
+       * Do NOT manually update currentIndex here.
+       *
+       * Instead, reload the interview from the database.
+       *
+       * The database now contains the newly submitted answer.
+       */
+      const updatedInterview = await loadInterview();
 
-      const nextIndex = currentIndex + 1;
+      /*
+       * Check whether all questions have now been answered.
+       */
+      const allAnswered =
+        updatedInterview.questions.length > 0 &&
+        updatedInterview.questions.every((question) => question.answer != null);
 
-      if (nextIndex >= interview.questions.length) {
+      if (allAnswered) {
+        /*
+         * The interview is complete.
+         *
+         * updatedInterview already contains the
+         * latest answer and score.
+         */
         setFinished(true);
-      } else {
-        setCurrentIndex(nextIndex);
-        if (interview.type !== "CODING") {
-          const nextQuestion = interview.questions[nextIndex];
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: `q-${nextQuestion.id}`,
-              role: "ai",
-              content: nextQuestion.question,
-            },
-          ]);
-        }
       }
-    } catch {
+    } catch (error) {
+      console.error("Submit answer error:", error);
+
       toast.error("Something went wrong submitting your answer.");
     } finally {
       setSubmitting(false);
     }
   }
 
+  /*
+   * Loading state.
+   */
   if (loading) {
     return (
       <div className="flex h-[60vh] items-center justify-center">
@@ -242,10 +316,14 @@ export function LiveInterviewClient({ interviewId }: { interviewId: string }) {
     );
   }
 
+  /*
+   * Interview not found.
+   */
   if (!interview) {
     return (
       <div className="flex h-[60vh] flex-col items-center justify-center gap-2 text-center">
         <p className="font-medium">Interview not found.</p>
+
         <button
           onClick={() => router.push("/practice")}
           className="text-sm text-primary underline"
@@ -257,27 +335,7 @@ export function LiveInterviewClient({ interviewId }: { interviewId: string }) {
   }
 
   if (finished) {
-    return (
-      <div className="mx-auto flex max-w-xl flex-col items-center gap-4 py-16 text-center">
-        <h1 className="font-display text-2xl font-semibold">
-          Interview complete 🎉
-        </h1>
-        {interview.score != null && (
-          <p className="text-muted-foreground">
-            Your average score:{" "}
-            <span className="font-semibold text-foreground">
-              {interview.score}/100
-            </span>
-          </p>
-        )}
-        <button
-          onClick={() => router.push("/practice")}
-          className="mt-2 rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground"
-        >
-          Back to practice
-        </button>
-      </div>
-    );
+    return <InterviewResults interview={interview} />;
   }
 
   return (

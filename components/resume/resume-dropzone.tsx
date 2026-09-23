@@ -11,11 +11,13 @@ export function ResumeDropzone({
   onUpload,
   onClear,
   analyzing,
+  disabled,
 }: {
   fileName: string | null;
-  onUpload: (name: string) => void;
+  onUpload: (file: File) => void;
   onClear: () => void;
   analyzing: boolean;
+  disabled?: boolean;
 }) {
   const [dragging, setDragging] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -23,8 +25,9 @@ export function ResumeDropzone({
   function handleDrop(e: React.DragEvent) {
     e.preventDefault();
     setDragging(false);
+    if (disabled) return;
     const file = e.dataTransfer.files?.[0];
-    if (file) onUpload(file.name);
+    if (file) onUpload(file);
   }
 
   if (fileName) {
@@ -57,13 +60,14 @@ export function ResumeDropzone({
     <Card
       onDragOver={(e) => {
         e.preventDefault();
-        setDragging(true);
+        if (!disabled) setDragging(true);
       }}
       onDragLeave={() => setDragging(false)}
       onDrop={handleDrop}
-      onClick={() => inputRef.current?.click()}
+      onClick={() => !disabled && inputRef.current?.click()}
       className={cn(
-        "flex cursor-pointer flex-col items-center justify-center gap-3 border-2 border-dashed p-12 text-center transition-colors",
+        "flex flex-col items-center justify-center gap-3 border-2 border-dashed p-12 text-center transition-colors",
+        disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
         dragging
           ? "border-primary bg-primary/5"
           : "border-border hover:border-primary/40 hover:bg-muted/40",
@@ -77,17 +81,20 @@ export function ResumeDropzone({
           Drag & drop your resume, or click to browse
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
-          Supports PDF, DOCX — up to 10MB
+          {disabled
+            ? "Add a target job description first"
+            : "Supports PDF, DOCX, TXT — up to 10MB"}
         </p>
       </div>
       <input
         ref={inputRef}
         type="file"
-        accept=".pdf,.doc,.docx"
+        accept=".pdf,.doc,.docx,.txt"
         className="hidden"
+        disabled={disabled}
         onChange={(e) => {
           const file = e.target.files?.[0];
-          if (file) onUpload(file.name);
+          if (file) onUpload(file);
         }}
       />
     </Card>

@@ -105,22 +105,6 @@ model Session {
   @@index([userId])
 }
 
-model Resume {
-  id     String @id @default(uuid())
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  fileName String
-  fileUrl  String
-  rawText  String? @db.Text
-
-  interviews Interview[]
-
-  createdAt DateTime @default(now())
-
-  @@index([userId])
-}
-
 model Interview {
   id     String @id @default(uuid())
   userId String
@@ -181,4 +165,59 @@ model InterviewAnswer {
   improvements String[] @default([])
 
   createdAt DateTime @default(now())
+}
+
+model Resume {
+  id          String   @id @default(cuid())
+  userId      String
+  fileName    String
+  fileUrl     String
+  rawText     String?  @db.Text
+  isActive    Boolean  @default(true)
+  atsScore    Int?
+  resumeScore Int?
+  uploadedAt  DateTime @default(now())
+
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  interviews  Interview[]
+  keywords    ResumeKeyword[]
+  skillGaps   ResumeSkillGap[]
+  suggestions ResumeSuggestion[]
+
+  @@index([userId, isActive])
+}
+
+model ResumeKeyword {
+  id       String  @id @default(cuid())
+  resumeId String
+  keyword  String
+  matched  Boolean
+
+  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  @@index([resumeId])
+}
+
+model ResumeSkillGap {
+  id         String             @id @default(cuid())
+  resumeId   String
+  skill      String
+  importance SuggestionPriority
+  note       String?
+
+  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  @@index([resumeId])
+}
+
+model ResumeSuggestion {
+  id       String             @id @default(cuid())
+  resumeId String
+  title    String
+  detail   String
+  priority SuggestionPriority
+
+  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  @@index([resumeId])
 }

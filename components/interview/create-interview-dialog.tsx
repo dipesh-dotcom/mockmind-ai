@@ -52,7 +52,6 @@ const EXPERIENCE_LEVELS = [
 const INTERVIEW_TYPES = [
   { value: "BEHAVIORAL", label: "Behavioral" },
   { value: "TEXT", label: "Text" },
-  { value: "VOICE", label: "Voice" },
   { value: "CODING", label: "Coding" },
 ] as const;
 
@@ -135,15 +134,32 @@ export function CreateInterviewDialog({
   // submits the form immediately, regardless of which step is showing.
   function handleFormKeyDown(e: React.KeyboardEvent<HTMLFormElement>) {
     if (e.key !== "Enter") return;
+
     const target = e.target as HTMLElement;
 
-    if (target.tagName === "TEXTAREA") return;
+    // Don't interfere with Enter inside textarea
+    if (target.tagName === "TEXTAREA") {
+      return;
+    }
 
+    // Don't interfere with file input
+    if (
+      target.tagName === "INPUT" &&
+      (target as HTMLInputElement).type === "file"
+    ) {
+      return;
+    }
+
+    // Don't submit while generating
+    if (submitting) {
+      e.preventDefault();
+      return;
+    }
+
+    // On steps 1 and 2, Enter means "Next"
     if (step < STEPS.length - 1) {
       e.preventDefault();
       handleNext();
-    } else if (submitting) {
-      e.preventDefault();
     }
   }
 
@@ -379,29 +395,6 @@ export function CreateInterviewDialog({
 
           {step === 2 && (
             <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="resumeFile">Upload resume (optional)</Label>
-                <label
-                  htmlFor="resumeFile"
-                  className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-muted/40 px-4 py-6 text-center transition-colors hover:border-primary/40"
-                >
-                  <Upload className="size-5 text-muted-foreground" />
-                  <p className="text-sm font-medium">
-                    {fileName ?? "Click to upload a file"}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    .txt works best — for PDFs, paste the text below
-                  </p>
-                  <input
-                    id="resumeFile"
-                    type="file"
-                    accept=".txt,.pdf,.doc,.docx"
-                    className="hidden"
-                    onChange={handleFileChange}
-                  />
-                </label>
-              </div>
-
               <div className="space-y-2">
                 <Label htmlFor="resumeText">Resume text (recommended)</Label>
                 <Textarea

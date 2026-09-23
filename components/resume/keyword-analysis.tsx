@@ -1,3 +1,5 @@
+"use client";
+
 import { AlertTriangle, CheckCircle2 } from "lucide-react";
 import {
   Card,
@@ -9,24 +11,16 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 
-const MATCHED_KEYWORDS = [
-  "React",
-  "TypeScript",
-  "REST APIs",
-  "Agile",
-  "Git",
-  "CI/CD",
-];
-const MISSING_KEYWORDS = [
-  "GraphQL",
-  "Kubernetes",
-  "System Design",
-  "Testing (Jest)",
-];
-
-export function KeywordAnalysis() {
-  const total = MATCHED_KEYWORDS.length + MISSING_KEYWORDS.length;
-  const matchPct = Math.round((MATCHED_KEYWORDS.length / total) * 100);
+export function KeywordAnalysis({
+  matchedKeywords,
+  missingKeywords,
+}: {
+  matchedKeywords: string[];
+  missingKeywords: string[];
+}) {
+  const total = matchedKeywords.length + missingKeywords.length;
+  const matchPct =
+    total > 0 ? Math.round((matchedKeywords.length / total) * 100) : 0;
 
   return (
     <Card>
@@ -45,55 +39,53 @@ export function KeywordAnalysis() {
           <Progress value={matchPct} />
         </div>
 
-        <div>
-          <p className="mb-2.5 flex items-center gap-1.5 text-sm font-medium">
-            <CheckCircle2 className="size-4 text-success" /> Matched keywords
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {MATCHED_KEYWORDS.map((k) => (
-              <Badge key={k} variant="success">
-                {k}
-              </Badge>
-            ))}
+        {matchedKeywords.length > 0 && (
+          <div>
+            <p className="mb-2.5 flex items-center gap-1.5 text-sm font-medium">
+              <CheckCircle2 className="size-4 text-success" /> Matched keywords
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {matchedKeywords.map((k) => (
+                <Badge key={k} variant="success">
+                  {k}
+                </Badge>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
-        <div>
-          <p className="mb-2.5 flex items-center gap-1.5 text-sm font-medium">
-            <AlertTriangle className="size-4 text-warning" /> Missing keywords
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {MISSING_KEYWORDS.map((k) => (
-              <Badge key={k} variant="warning">
-                {k}
-              </Badge>
-            ))}
+        {missingKeywords.length > 0 && (
+          <div>
+            <p className="mb-2.5 flex items-center gap-1.5 text-sm font-medium">
+              <AlertTriangle className="size-4 text-warning" /> Missing keywords
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {missingKeywords.map((k) => (
+                <Badge key={k} variant="warning">
+                  {k}
+                </Badge>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );
 }
 
-const MISSING_SKILLS = [
-  {
-    skill: "System Design",
-    importance: "High",
-    note: "Appears in 4 of 5 similar job postings.",
-  },
-  {
-    skill: "GraphQL",
-    importance: "Medium",
-    note: "Increasingly requested for this role level.",
-  },
-  {
-    skill: "Kubernetes",
-    importance: "Medium",
-    note: "Common in infra-adjacent frontend roles.",
-  },
-];
+const IMPORTANCE_LABEL: Record<string, string> = {
+  HIGH: "High",
+  MEDIUM: "Medium",
+  LOW: "Low",
+};
 
-export function MissingSkills() {
+export function MissingSkills({
+  skillGaps,
+}: {
+  skillGaps: { skill: string; importance: string; note?: string | null }[];
+}) {
+  if (skillGaps.length === 0) return null;
+
   return (
     <Card>
       <CardHeader>
@@ -103,7 +95,7 @@ export function MissingSkills() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
-        {MISSING_SKILLS.map((item) => (
+        {skillGaps.map((item) => (
           <div
             key={item.skill}
             className="flex items-start gap-3 rounded-xl border border-border p-3.5"
@@ -113,14 +105,19 @@ export function MissingSkills() {
                 <p className="text-sm font-medium">{item.skill}</p>
                 <Badge
                   variant={
-                    item.importance === "High" ? "destructive" : "warning"
+                    item.importance === "HIGH" ? "destructive" : "warning"
                   }
-                  className="text-[10px]"
+                  className="text-xs"
                 >
-                  {item.importance} priority
+                  {IMPORTANCE_LABEL[item.importance] ?? item.importance}{" "}
+                  priority
                 </Badge>
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">{item.note}</p>
+              {item.note && (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {item.note}
+                </p>
+              )}
             </div>
           </div>
         ))}

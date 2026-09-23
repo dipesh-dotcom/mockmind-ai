@@ -1,51 +1,107 @@
 import type { Metadata, Viewport } from "next";
+
 import "./globals.css";
-// NOTE: This build environment has no network access to Google Fonts, so we use a
-// system font stack ("Inter"/"Lexend" with OS fallbacks) defined in globals.css.
-// In a real deployment, swap back to `next/font/google` for self-hosted, zero-layout-shift
-// Inter + Lexend by restoring the `Inter`/`Lexend` imports here.
+
 import { ThemeProvider } from "@/components/shared/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { SessionProvider } from "next-auth/react";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://mockmind.ai"),
+
   title: {
-    default: "MockMind AI — Ace Every Interview with AI",
+    default: "MockMind AI — AI Interview Preparation",
     template: "%s · MockMind AI",
   },
+
   description:
-    "MockMind AI is a premium AI-powered interview preparation platform. Practice voice, text, coding, and behavioral interviews, analyze your resume, and land your dream job.",
+    "Prepare for your next interview with MockMind AI. Practice realistic AI-powered interviews, analyze your resume, improve your answers, and get personalized feedback.",
+
   keywords: [
+    "MockMind AI",
     "AI interview preparation",
+    "AI mock interview",
     "mock interview",
-    "resume analyzer",
-    "coding interview practice",
+    "interview practice",
+    "technical interview",
     "behavioral interview",
-    "job interview AI",
+    "coding interview",
+    "resume analyzer",
+    "resume analysis",
+    "interview feedback",
+    "job interview preparation",
   ],
-  metadataBase: new URL("https://mockmind.ai"),
+
+  applicationName: "MockMind AI",
+
+  authors: [
+    {
+      name: "MockMind AI",
+      url: "https://mockmind.ai",
+    },
+  ],
+
+  creator: "MockMind AI",
+  publisher: "MockMind AI",
+
+  category: "Education",
+
   openGraph: {
-    title: "MockMind AI — Ace Every Interview with AI",
-    description:
-      "Practice voice, text, coding, and behavioral interviews with a realistic AI interviewer. Get instant feedback and land your dream job.",
+    type: "website",
+    locale: "en_US",
     url: "https://mockmind.ai",
     siteName: "MockMind AI",
-    type: "website",
+
+    title: "MockMind AI — AI Interview Preparation",
+
+    description:
+      "Practice realistic AI-powered interviews, analyze your resume, and get personalized feedback to improve your interview performance.",
+
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "MockMind AI — AI Interview Preparation",
+      },
+    ],
   },
+
   twitter: {
     card: "summary_large_image",
-    title: "MockMind AI — Ace Every Interview with AI",
+
+    title: "MockMind AI — AI Interview Preparation",
+
     description:
-      "Practice voice, text, coding, and behavioral interviews with a realistic AI interviewer.",
+      "Practice realistic AI-powered interviews, analyze your resume, and get personalized feedback.",
+
+    images: ["/og-image.png"],
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
+
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#09090b" },
+    {
+      media: "(prefers-color-scheme: light)",
+      color: "#ffffff",
+    },
+    {
+      media: "(prefers-color-scheme: dark)",
+      color: "#09090b",
+    },
   ],
 };
 
@@ -65,6 +121,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             {children}
+
             <Toaster richColors position="top-right" closeButton />
           </ThemeProvider>
         </SessionProvider>

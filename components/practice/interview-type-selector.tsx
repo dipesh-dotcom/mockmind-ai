@@ -12,12 +12,6 @@ export const INTERVIEW_TYPES = [
     icon: LayoutGrid,
   },
   {
-    value: "voice",
-    label: "Voice Interview",
-    description: "Speak naturally with a realistic AI interviewer",
-    icon: Mic,
-  },
-  {
     value: "text",
     label: "Text Interview",
     description: "Type your responses at your own pace",

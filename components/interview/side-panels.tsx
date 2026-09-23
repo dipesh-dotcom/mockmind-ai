@@ -4,13 +4,9 @@ import * as React from "react";
 import { ChevronDown, Lightbulb } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { NotesPanel } from "@/components/interview/notes-panel";
-import { VoiceControls } from "./camera-preview";
 import { cn } from "@/lib/utils";
 
 export function SidePanels({
-  type,
-  recording,
-  onToggleRecording,
   expectedAnswer,
   hints,
 }: {
@@ -24,15 +20,6 @@ export function SidePanels({
 
   return (
     <div className="flex h-full flex-col gap-4">
-      {type === "VOICE" && (
-        <>
-          <VoiceControls
-            recording={!!recording}
-            onToggle={onToggleRecording ?? (() => {})}
-          />
-        </>
-      )}
-
       {expectedAnswer && (
         <Card className="shrink-0 overflow-hidden p-0">
           <button
