@@ -52,7 +52,6 @@ const EXPERIENCE_LEVELS = [
 const INTERVIEW_TYPES = [
   { value: "BEHAVIORAL", label: "Behavioral" },
   { value: "TEXT", label: "Text" },
-  { value: "CODING", label: "Coding" },
 ] as const;
 
 const FOCUS_AREA_OPTIONS = [

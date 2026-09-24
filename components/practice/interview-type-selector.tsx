@@ -18,12 +18,6 @@ export const INTERVIEW_TYPES = [
     icon: Type,
   },
   {
-    value: "coding",
-    label: "Coding Interview",
-    description: "Solve DSA & system design problems live",
-    icon: Code2,
-  },
-  {
     value: "behavioral",
     label: "Behavioral Interview",
     description: "Practice STAR-format leadership stories",

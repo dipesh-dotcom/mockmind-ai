@@ -12,7 +12,6 @@ export const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Interview Practice", href: "/practice", icon: Mic },
   { label: "Resume Analyzer", href: "/resume-analyzer", icon: FileSearch },
-  { label: "Learning Hub", href: "/learning-hub", icon: GraduationCap },
   { label: "Profile", href: "/profile", icon: User },
 ];
 

@@ -8,9 +8,7 @@ import { Reveal } from "@/components/shared/reveal";
 import type { InterviewSummary } from "@/types/interview";
 
 const TYPE_TO_ENUM: Record<string, InterviewSummary["type"]> = {
-  voice: "VOICE",
   text: "TEXT",
-  coding: "CODING",
   behavioral: "BEHAVIORAL",
 };
 
