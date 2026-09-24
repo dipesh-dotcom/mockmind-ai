@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { ChatPanel, type ChatMessage } from "@/components/interview/chat-panel";
-import { CodeEditorPanel } from "@/components/interview/code-editor-panel";
 import { SessionHeader } from "@/components/interview/session-header";
 import { SidePanels } from "@/components/interview/side-panels";
 import { InterviewResults } from "./interview-results";
@@ -296,19 +295,11 @@ export function LiveInterviewClient({ interviewId }: { interviewId: string }) {
       />
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-[1fr_320px]">
         <div className="min-h-0 overflow-hidden rounded-2xl border border-border">
-          {interview.type === "CODING" && currentQuestion ? (
-            <CodeEditorPanel
-              question={currentQuestion.question}
-              submitting={submitting}
-              onSubmit={(code) => submitAnswer(code)}
-            />
-          ) : (
-            <ChatPanel
-              messages={messages}
-              onSend={submitAnswer}
-              disabled={submitting}
-            />
-          )}
+          <ChatPanel
+            messages={messages}
+            onSend={submitAnswer}
+            disabled={submitting}
+          />
         </div>
         <div className="hidden lg:block">
           <SidePanels
