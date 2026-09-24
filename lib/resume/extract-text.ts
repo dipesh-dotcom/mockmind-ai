@@ -1,20 +1,25 @@
-import { PDFParse } from "pdf-parse";
+function parsePdfBuffer(buffer: Buffer): Promise<string> {
+  return new Promise((resolve, reject) => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const PDFParser = require("pdf2json");
+    const pdfParser = new PDFParser(null, 1);
 
-async function parsePdfBuffer(buffer: Buffer): Promise<string> {
-  const parser = new PDFParse({ data: buffer });
+    pdfParser.on("pdfParser_dataError", (errData: any) => {
+      reject(
+        new Error(
+          errData?.parserError?.message ??
+            "Couldn't extract text from this PDF.",
+        ),
+      );
+    });
 
-  try {
-    const result = await parser.getText();
-    return result.text.trim();
-  } catch (err) {
-    throw new Error(
-      err instanceof Error
-        ? `Couldn't extract text from this PDF: ${err.message}`
-        : "Couldn't extract text from this PDF.",
-    );
-  } finally {
-    await parser.destroy();
-  }
+    pdfParser.on("pdfParser_dataReady", () => {
+      const text = pdfParser.getRawTextContent();
+      resolve(text.trim());
+    });
+
+    pdfParser.parseBuffer(buffer);
+  });
 }
 
 export async function extractResumeText(file: File): Promise<string> {
