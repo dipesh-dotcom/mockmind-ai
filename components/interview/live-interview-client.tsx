@@ -81,7 +81,13 @@ export function LiveInterviewClient({ interviewId }: { interviewId: string }) {
 
     if (loadedInterview.type !== "CODING") {
       const seededMessages: ChatMessage[] = [];
-      for (const question of loadedInterview.questions) {
+      const upperBound = Math.min(
+        startIndex,
+        loadedInterview.questions.length - 1,
+      );
+
+      for (let i = 0; i <= upperBound; i++) {
+        const question = loadedInterview.questions[i];
         seededMessages.push({
           id: `q-${question.id}`,
           role: "ai",
@@ -160,11 +166,8 @@ export function LiveInterviewClient({ interviewId }: { interviewId: string }) {
 
     recognition.onend = () => {
       setRecording(false);
-
       const finalTranscript = accumulated.trim();
-
       accumulated = "";
-
       if (finalTranscript) {
         submitAnswer(finalTranscript);
       }
@@ -181,22 +184,14 @@ export function LiveInterviewClient({ interviewId }: { interviewId: string }) {
 
       recognitionRef.current = null;
     };
-
-    // submitAnswer intentionally omitted because this effect
-    // should restart when the interview question changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [interview?.type, currentIndex]);
 
-  /*
-   * Start / stop voice recording.
-   */
   function toggleRecording() {
     if (!recognitionRef.current) {
       toast.error("Speech recognition isn't supported in this browser.");
 
       return;
     }
-
     if (recording) {
       recognitionRef.current.stop();
       setRecording(false);
@@ -211,31 +206,19 @@ export function LiveInterviewClient({ interviewId }: { interviewId: string }) {
       }
     }
   }
-
   const currentQuestion = interview?.questions[currentIndex];
-
-  /*
-   * Submit the current answer.
-   */
   async function submitAnswer(transcript: string) {
     if (!interview || !currentQuestion || submitting) {
       return;
     }
-
     const trimmedTranscript = transcript.trim();
-
     if (!trimmedTranscript) {
       toast.error("Please provide an answer.");
 
       return;
     }
-
     setSubmitting(true);
-
     try {
-      /*
-       * Save and score the answer.
-       */
       const res = await fetch(`/api/interviews/${interview.id}/answers`, {
         method: "POST",
 
@@ -248,7 +231,6 @@ export function LiveInterviewClient({ interviewId }: { interviewId: string }) {
           transcript: trimmedTranscript,
         }),
       });
-
       const data = (await res.json()) as {
         answer?: {
           score: number | null;
@@ -259,41 +241,17 @@ export function LiveInterviewClient({ interviewId }: { interviewId: string }) {
 
         error?: string;
       };
-
-      /*
-       * Handle API errors.
-       */
       if (!res.ok || !data.answer) {
         toast.error(data.error ?? "Couldn't score your answer.");
 
         return;
       }
-
-      /*
-       * IMPORTANT:
-       *
-       * Do NOT manually update currentIndex here.
-       *
-       * Instead, reload the interview from the database.
-       *
-       * The database now contains the newly submitted answer.
-       */
       const updatedInterview = await loadInterview();
-
-      /*
-       * Check whether all questions have now been answered.
-       */
       const allAnswered =
         updatedInterview.questions.length > 0 &&
         updatedInterview.questions.every((question) => question.answer != null);
 
       if (allAnswered) {
-        /*
-         * The interview is complete.
-         *
-         * updatedInterview already contains the
-         * latest answer and score.
-         */
         setFinished(true);
       }
     } catch (error) {
@@ -304,10 +262,6 @@ export function LiveInterviewClient({ interviewId }: { interviewId: string }) {
       setSubmitting(false);
     }
   }
-
-  /*
-   * Loading state.
-   */
   if (loading) {
     return (
       <div className="flex h-[60vh] items-center justify-center">
@@ -315,10 +269,6 @@ export function LiveInterviewClient({ interviewId }: { interviewId: string }) {
       </div>
     );
   }
-
-  /*
-   * Interview not found.
-   */
   if (!interview) {
     return (
       <div className="flex h-[60vh] flex-col items-center justify-center gap-2 text-center">
@@ -333,11 +283,9 @@ export function LiveInterviewClient({ interviewId }: { interviewId: string }) {
       </div>
     );
   }
-
   if (finished) {
     return <InterviewResults interview={interview} />;
   }
-
   return (
     <div className="mx-auto flex h-[calc(100vh-6rem)] max-w-7xl flex-col gap-4">
       <SessionHeader
@@ -346,7 +294,6 @@ export function LiveInterviewClient({ interviewId }: { interviewId: string }) {
         totalQuestions={interview.questions.length}
         type={interview.type}
       />
-
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-[1fr_320px]">
         <div className="min-h-0 overflow-hidden rounded-2xl border border-border">
           {interview.type === "CODING" && currentQuestion ? (
@@ -363,7 +310,6 @@ export function LiveInterviewClient({ interviewId }: { interviewId: string }) {
             />
           )}
         </div>
-
         <div className="hidden lg:block">
           <SidePanels
             type={interview.type}

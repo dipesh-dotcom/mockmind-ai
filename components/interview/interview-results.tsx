@@ -2,9 +2,11 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   CheckCircle2,
   ChevronDown,
+  Loader2,
   MessageSquareText,
   Target,
   TrendingUp,
@@ -50,6 +52,7 @@ interface InterviewResultsProps {
 
 export function InterviewResults({ interview }: InterviewResultsProps) {
   const router = useRouter();
+  const [resetting, setResetting] = React.useState(false);
 
   const answeredQuestions = interview.questions.filter(
     (q) => q.answer?.score != null,
@@ -87,6 +90,29 @@ export function InterviewResults({ interview }: InterviewResultsProps) {
       ),
     ),
   );
+
+  async function handlePracticeAgain() {
+    if (resetting) return;
+    setResetting(true);
+
+    try {
+      const res = await fetch(`/api/interviews/${interview.id}/reset`, {
+        method: "POST",
+      });
+
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        toast.error(data.error ?? "Couldn't start this interview again.");
+        return;
+      }
+
+      router.push(`/practice/${interview.id}`);
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setResetting(false);
+    }
+  }
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:py-12">
@@ -559,10 +585,12 @@ export function InterviewResults({ interview }: InterviewResultsProps) {
           </button>
 
           <button
-            onClick={() => router.push("/practice")}
-            className="rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition hover:opacity-90"
+            onClick={handlePracticeAgain}
+            disabled={resetting}
+            className="flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition hover:opacity-90 disabled:opacity-60"
           >
-            Practice again
+            {resetting && <Loader2 className="size-4 animate-spin" />}
+            {resetting ? "Starting..." : "Practice again"}
           </button>
         </div>
       </div>
