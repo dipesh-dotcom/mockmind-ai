@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Send, Sparkles } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,8 @@ export type ChatMessage = {
   role: "ai" | "user";
   content: string;
 };
+
+const MAX_TEXTAREA_HEIGHT = 160;
 
 export function ChatPanel({
   messages,
@@ -26,16 +28,36 @@ export function ChatPanel({
 }) {
   const [draft, setDraft] = React.useState("");
   const endRef = React.useRef<HTMLDivElement>(null);
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const { data: session } = useSession();
+
   React.useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length]);
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  React.useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, MAX_TEXTAREA_HEIGHT)}px`;
+  }, [draft]);
+
+  function submitDraft() {
     if (!draft.trim()) return;
     onSend(draft.trim());
     setDraft("");
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    submitDraft();
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      submitDraft();
+    }
   }
 
   return (
@@ -51,22 +73,30 @@ export function ChatPanel({
               )}
             >
               <Avatar className="h-9 w-9 shrink-0">
-                <AvatarImage
-                  src={session?.user?.image ?? ""}
-                  alt={session?.user?.name ?? ""}
-                />
-                <AvatarFallback className="gradient-brand text-xs font-medium text-white">
-                  {session?.user?.name
-                    ?.split(" ")
-                    .map((word) => word[0])
-                    .join("")
-                    .slice(0, 2)
-                    .toUpperCase()}
-                </AvatarFallback>
+                {m.role === "ai" ? (
+                  <AvatarFallback className="gradient-brand text-white">
+                    <Sparkles className="size-4.5" />
+                  </AvatarFallback>
+                ) : (
+                  <>
+                    <AvatarImage
+                      src={session?.user?.image ?? ""}
+                      alt={session?.user?.name ?? ""}
+                    />
+                    <AvatarFallback className="bg-muted text-xs font-medium text-foreground">
+                      {session?.user?.name
+                        ?.split(" ")
+                        .map((word) => word[0])
+                        .join("")
+                        .slice(0, 2)
+                        .toUpperCase()}
+                    </AvatarFallback>
+                  </>
+                )}
               </Avatar>
               <div
                 className={cn(
-                  "max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
+                  "max-w-[80%] whitespace-pre-wrap rounded-2xl px-4 py-3 text-sm leading-relaxed",
                   m.role === "ai"
                     ? "rounded-tl-sm bg-muted text-foreground"
                     : "rounded-tr-sm gradient-brand text-white",
@@ -82,20 +112,23 @@ export function ChatPanel({
 
       <form
         onSubmit={handleSubmit}
-        className="flex items-center gap-2.5 border-t border-border p-4 sm:p-5"
+        className="flex items-end gap-2.5 border-t border-border p-4 sm:p-5"
       >
-        <Input
+        <Textarea
+          ref={textareaRef}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          placeholder="Type your response..."
+          onKeyDown={handleKeyDown}
+          placeholder="Type your response... (Shift+Enter for a new line)"
           disabled={disabled}
-          className="h-12 text-sm"
+          rows={1}
+          className="max-h-40 min-h-12 resize-none overflow-y-auto py-3 text-sm"
         />
         <Button
           type="submit"
           size="icon"
           className="h-12 w-12 shrink-0 rounded-full"
-          disabled={disabled}
+          disabled={disabled || !draft.trim()}
         >
           <Send className="size-4.5" />
         </Button>
