@@ -40,13 +40,7 @@ export function DashboardTopNav({ title }: { title?: string }) {
         </h1>
       )}
 
-      <div className="relative ml-auto hidden max-w-sm flex-1 sm:block lg:max-w-md">
-        <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          placeholder="Search roles, questions, courses..."
-          className="h-10 pl-10 shadow-sm"
-        />
-      </div>
+      <div className="relative ml-auto hidden max-w-sm flex-1 sm:block lg:max-w-md"></div>
 
       <div className="ml-auto flex items-center gap-1 sm:ml-0">
         <CreateInterviewDialog
